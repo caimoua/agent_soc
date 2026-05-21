@@ -98,12 +98,18 @@ slot：
 
 文件：`rtl/top/rv32i_ahb_matrix_apb_soc_top.v`
 
-用途：在 AHB matrix SoC 的 APB slot 后面接 AHB-to-APB bridge、APB mux、timer 和 UART。
+用途：在 AHB matrix SoC 的 APB slot 后面接 AHB-to-APB bridge、APB mux、timer、UART 和 Agent Matrix Accelerator。
 
 APB 外设：
 
 - timer：`0x4200_0000`
 - UART：`0x4200_1000`
+- Agent Matrix Accelerator：`0x4200_2000`
+
+新增中断/状态输出：
+
+- `timer_irq`：已接入 CPU machine timer interrupt，同时作为 top-level debug/output。
+- `agent_matrix_irq`：v0.2a 先作为 top-level output 暴露，尚未接入 CPU trap/interrupt 路径。
 
 ## Core
 
@@ -418,3 +424,28 @@ base：`0x4000_0000` 或 APB SoC 中的 `0x4200_0000`。
 base：`0x4000_1000` 或 APB SoC 中的 `0x4200_1000`。
 
 当前是最小 TX-only UART，用于 MMIO 输出验证。
+
+### `rv32i_agent_matrix_accel`
+
+文件：`rtl/accel/rv32i_agent_matrix_accel.v`
+
+base：APB SoC 中的 `0x4200_2000`。
+
+用途：Agent SoC v0.2a 的最小 INT8 matvec 加速器。CPU 通过 APB scratchpad 写入固定 `4x4` signed int8 matrix 和 `4x1` signed int8 vector，写 `CTRL.start` 后模块生成 4 个 signed int32 result，CPU 通过 polling `STATUS.done` 读取结果。
+
+寄存器：
+
+- `0x000 CTRL`：bit0 `start`，bit1 `irq_en`，bit2 `clear`。
+- `0x004 STATUS`：bit0 `busy`，bit1 `done`，bit2 `irq_pending`。
+- `0x014 SHAPE`：固定返回 `M=4, N=1, K=4`。
+- `0x028 IRQ_STATUS`：bit0 `irq_pending`。
+- `0x02c IRQ_CLEAR`：写 1 清 `irq_pending`。
+- `0x100` - `0x10c`：matrix A scratchpad，4 个 word，每 word 打包 4 个 int8。
+- `0x140`：vector B scratchpad，1 个 word 打包 4 个 int8。
+- `0x180` - `0x18c`：4 个 int32 result。
+
+Debug 输出：
+
+- `dbg_status`
+- `dbg_result0` - `dbg_result3`
+- `dbg_start_count`

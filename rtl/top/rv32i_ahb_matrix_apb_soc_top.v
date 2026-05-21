@@ -49,6 +49,7 @@ module rv32i_ahb_matrix_apb_soc_top #(
   output wire        uart_tx_valid,
   output wire [7:0]  uart_tx_data,
   output wire        timer_irq,
+  output wire        agent_matrix_irq,
 
   output wire [31:0] dbg_pc,
   output wire [31:0] dbg_cycle,
@@ -82,7 +83,13 @@ module rv32i_ahb_matrix_apb_soc_top #(
   output wire [31:0] dbg_timer_mtimecmp_hi,
   output wire [31:0] dbg_timer_ctrl,
   output wire [31:0] dbg_uart_tx_count,
-  output wire [7:0]  dbg_uart_last_tx
+  output wire [7:0]  dbg_uart_last_tx,
+  output wire [31:0] dbg_agent_matrix_status,
+  output wire [31:0] dbg_agent_matrix_result0,
+  output wire [31:0] dbg_agent_matrix_result1,
+  output wire [31:0] dbg_agent_matrix_result2,
+  output wire [31:0] dbg_agent_matrix_result3,
+  output wire [31:0] dbg_agent_matrix_start_count
 );
 
   wire        apb_hsel;
@@ -124,6 +131,14 @@ module rv32i_ahb_matrix_apb_soc_top #(
   wire [3:0]  uart_wstrb;
   wire        uart_ready;
   wire [31:0] uart_rdata;
+
+  wire        agent_matrix_valid;
+  wire        agent_matrix_write;
+  wire [31:0] agent_matrix_addr;
+  wire [31:0] agent_matrix_wdata;
+  wire [3:0]  agent_matrix_wstrb;
+  wire        agent_matrix_ready;
+  wire [31:0] agent_matrix_rdata;
 
   rv32i_ahb_matrix_soc_top #(
     .ICACHE_INDEX_BITS(ICACHE_INDEX_BITS),
@@ -259,6 +274,13 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .uart_wstrb       (uart_wstrb),
     .uart_ready       (uart_ready),
     .uart_rdata       (uart_rdata),
+    .agent_matrix_valid(agent_matrix_valid),
+    .agent_matrix_write(agent_matrix_write),
+    .agent_matrix_addr (agent_matrix_addr),
+    .agent_matrix_wdata(agent_matrix_wdata),
+    .agent_matrix_wstrb(agent_matrix_wstrb),
+    .agent_matrix_ready(agent_matrix_ready),
+    .agent_matrix_rdata(agent_matrix_rdata),
     .dbg_decode_error (dbg_apb_decode_error)
   );
 
@@ -294,6 +316,25 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .tx_data      (uart_tx_data),
     .dbg_tx_count (dbg_uart_tx_count),
     .dbg_last_tx  (dbg_uart_last_tx)
+  );
+
+  rv32i_agent_matrix_accel u_agent_matrix_accel (
+    .clk             (clk),
+    .rst_n           (rst_n),
+    .valid           (agent_matrix_valid),
+    .write           (agent_matrix_write),
+    .addr            (agent_matrix_addr),
+    .wdata           (agent_matrix_wdata),
+    .wstrb           (agent_matrix_wstrb),
+    .ready           (agent_matrix_ready),
+    .rdata           (agent_matrix_rdata),
+    .irq             (agent_matrix_irq),
+    .dbg_status      (dbg_agent_matrix_status),
+    .dbg_result0     (dbg_agent_matrix_result0),
+    .dbg_result1     (dbg_agent_matrix_result1),
+    .dbg_result2     (dbg_agent_matrix_result2),
+    .dbg_result3     (dbg_agent_matrix_result3),
+    .dbg_start_count (dbg_agent_matrix_start_count)
   );
 
 endmodule

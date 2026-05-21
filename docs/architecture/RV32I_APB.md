@@ -18,6 +18,7 @@ rv32i_cached_ahb_master_top
       -> rv32i_apb_periph_mux
         -> rv32i_timer
         -> rv32i_uart
+        -> rv32i_agent_matrix_accel
 ```
 
 ## Modules
@@ -29,12 +30,15 @@ rv32i_cached_ahb_master_top
   - Converts AHB `HSIZE/HADDR` into APB `PSTRB`.
   - Converts APB `PSLVERR` into AHB `HRESP=ERROR`.
 - `rtl/periph/rv32i_apb_periph_mux.v`
-  - Decodes APB timer and UART windows.
+  - Decodes APB timer, UART, and Agent Matrix Accelerator windows.
   - Unmatched APB accesses complete with `PSLVERR=1`.
 - `rtl/top/rv32i_ahb_matrix_apb_soc_top.v`
   - Keeps flash/SRAM/AHB-peripheral AHB slots external.
-  - Instantiates internal APB timer and UART.
+  - Instantiates internal APB timer, UART, and Agent Matrix Accelerator.
   - Routes timer interrupt into the CPU subsystem.
+- `rtl/accel/rv32i_agent_matrix_accel.v`
+  - APB scratchpad INT8 `4x4` matrix by `4x1` vector accelerator.
+  - Generates 4 signed int32 results and a done/IRQ-pending status.
 
 ## Memory Map
 
@@ -44,6 +48,7 @@ rv32i_cached_ahb_master_top
 0x4000_0000 - 0x41FF_FFFF  AHB peripheral slot
 0x4200_0000 - 0x4200_0FFF  APB timer
 0x4200_1000 - 0x4200_1FFF  APB UART
+0x4200_2000 - 0x4200_2FFF  APB Agent Matrix Accelerator
 ```
 
 ## Directed Test
@@ -64,3 +69,20 @@ make sim TB_FILE=./testcases/rv32i_ahb_matrix_apb_soc_top_tb.sv TOP_NAME=rv32i_a
 The test boots from flash, accesses SRAM, writes/reads the external AHB peripheral slot, writes/reads APB timer `mtimecmp_lo`, and writes/reads APB UART TX/status.
 
 Status: user-confirmed VCS PASS on 2026-05-18.
+
+Agent Matrix Accelerator smoke image:
+
+```text
+software/asm/agent_matrix_accel.S
+software/bin/agent_matrix_accel.memh
+```
+
+Run from `sim/`:
+
+```bash
+make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_soc_tb
+```
+
+This test boots from flash, writes APB scratchpad matrix/vector data at `0x4200_2000`, starts the accelerator, polls done, checks four int32 results and IRQ pending/clear behavior, then stops on `ebreak`.
+
+Status: pending VCS confirmation.

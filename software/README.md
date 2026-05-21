@@ -23,6 +23,7 @@ asm/ahb_matrix_soc.S
 ```text
 ahb_matrix_soc
 ahb_matrix_apb_soc
+agent_matrix_accel
 cached_system_smoke
 cached_ahb_master
 cached_timer

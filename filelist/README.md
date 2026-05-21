@@ -21,4 +21,5 @@ FILELIST_DIR=$(REPO_ROOT)/filelist/cpu_filelist
 - `cpu_filelist/mem_rtl.f`
 - `cpu_filelist/bus_rtl.f`
 - `cpu_filelist/periph_rtl.f`
+- `cpu_filelist/accel_rtl.f`
 - `cpu_filelist/top_rtl.f`

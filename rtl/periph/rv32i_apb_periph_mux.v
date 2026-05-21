@@ -2,7 +2,9 @@ module rv32i_apb_periph_mux #(
   parameter [31:0] TIMER_BASE = 32'h4200_0000,
   parameter [31:0] TIMER_MASK = 32'hFFFF_F000,
   parameter [31:0] UART_BASE  = 32'h4200_1000,
-  parameter [31:0] UART_MASK  = 32'hFFFF_F000
+  parameter [31:0] UART_MASK  = 32'hFFFF_F000,
+  parameter [31:0] AGENT_MATRIX_BASE = 32'h4200_2000,
+  parameter [31:0] AGENT_MATRIX_MASK = 32'hFFFF_F000
 ) (
   input  wire        psel,
   input  wire        penable,
@@ -31,16 +33,26 @@ module rv32i_apb_periph_mux #(
   input  wire        uart_ready,
   input  wire [31:0] uart_rdata,
 
+  output wire        agent_matrix_valid,
+  output wire        agent_matrix_write,
+  output wire [31:0] agent_matrix_addr,
+  output wire [31:0] agent_matrix_wdata,
+  output wire [3:0]  agent_matrix_wstrb,
+  input  wire        agent_matrix_ready,
+  input  wire [31:0] agent_matrix_rdata,
+
   output wire        dbg_decode_error
 );
 
   wire apb_access;
   wire timer_sel;
   wire uart_sel;
+  wire agent_matrix_sel;
 
-  assign apb_access = psel && penable;
-  assign timer_sel  = ((paddr & TIMER_MASK) == TIMER_BASE);
-  assign uart_sel   = ((paddr & UART_MASK) == UART_BASE);
+  assign apb_access       = psel && penable;
+  assign timer_sel        = ((paddr & TIMER_MASK) == TIMER_BASE);
+  assign uart_sel         = ((paddr & UART_MASK) == UART_BASE);
+  assign agent_matrix_sel = ((paddr & AGENT_MATRIX_MASK) == AGENT_MATRIX_BASE);
 
   assign timer_valid = apb_access && timer_sel;
   assign timer_write = pwrite;
@@ -54,14 +66,22 @@ module rv32i_apb_periph_mux #(
   assign uart_wdata = pwdata;
   assign uart_wstrb = pstrb;
 
+  assign agent_matrix_valid = apb_access && agent_matrix_sel;
+  assign agent_matrix_write = pwrite;
+  assign agent_matrix_addr  = paddr;
+  assign agent_matrix_wdata = pwdata;
+  assign agent_matrix_wstrb = pstrb;
+
   assign pready = !apb_access ? 1'b1 :
                   timer_sel   ? timer_ready :
                   uart_sel    ? uart_ready  :
+                  agent_matrix_sel ? agent_matrix_ready :
                                 1'b1;
   assign prdata = timer_sel ? timer_rdata :
                   uart_sel  ? uart_rdata  :
+                  agent_matrix_sel ? agent_matrix_rdata :
                               32'd0;
-  assign pslverr = apb_access && !timer_sel && !uart_sel;
+  assign pslverr = apb_access && !timer_sel && !uart_sel && !agent_matrix_sel;
 
   assign dbg_decode_error = pslverr;
 

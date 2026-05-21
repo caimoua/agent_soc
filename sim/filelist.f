@@ -10,4 +10,5 @@
 -f ../filelist/cpu_filelist/mem_rtl.f
 -f ../filelist/cpu_filelist/bus_rtl.f
 -f ../filelist/cpu_filelist/periph_rtl.f
+-f ../filelist/cpu_filelist/accel_rtl.f
 -f ../filelist/cpu_filelist/top_rtl.f

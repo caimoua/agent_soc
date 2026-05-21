@@ -44,7 +44,7 @@
 - NPU systolic array。
 - NPU tensor sequencer / microcode SRAM。
 - NPU local buffer。
-- Agent Matrix Accelerator。
+- Agent Matrix Accelerator 目前只有 APB scratchpad v0.2a 原型，还没有 SRAM/DMA 数据路径，也不是完整 NPU。
 - Tool-call Detector。
 - Token Sampler。
 - KV-cache Manager。

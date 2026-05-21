@@ -11,6 +11,7 @@ cpu_prj/
     bus/        内部 memory bus、后续 AHB/AXI adapter
     mem/        后续 memory 和 cache 模块
     periph/     timer、UART、debug 等 MMIO 外设
+    accel/      Agent/NPU 方向的早期加速器 RTL，例如 rv32i_agent_matrix_accel
     include/    共享 Verilog 头文件
   filelist/
     cpu_filelist/
