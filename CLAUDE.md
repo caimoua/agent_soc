@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 这个文件用于给 Claude Code 或其他代码助手提供本仓库的工作上下文。
 
@@ -84,7 +84,7 @@ filelist 通过 `+incdir+` 提供 include 路径。
 
 当前 D-mem 实现了 byte、halfword、word 访问语义；单周期 core 仍按单周期 memory 使用，流水线 core 已支持指令/数据存储器等待停顿。当前 SYSTEM/CSR 只实现 `cycle` 只读 CSR 和 `ecall/ebreak` 事件观测，后续会再补非对齐异常、trap 和更完整的 cache/bus handshake。
 
-最小 trap/CSR 新阶段的设计文档是 `docs/RV32I_TRAP_CSR.md`。该阶段目标是加入 `mtvec/mepc/mcause`、`ecall/ebreak/illegal` trap、`mret` 返回，并把 trap 放到 MEM/WB commit 阶段处理以保证 precise exception。
+最小 trap/CSR 新阶段的设计文档是 `docs/architecture/RV32I_TRAP_CSR.md`。该阶段目标是加入 `mtvec/mepc/mcause`、`ecall/ebreak/illegal` trap、`mret` 返回，并把 trap 放到 MEM/WB commit 阶段处理以保证 precise exception。
 
 ### Testbench
 

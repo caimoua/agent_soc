@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [ValidateSet("smoke", "core", "cache", "ahb", "mmio", "soc", "isa", "full")]
+  [ValidateSet("smoke", "core", "cache", "ahb", "mmio", "soc", "isa", "agent", "full")]
   [string]$Suite = "smoke",
 
   [switch]$DryRun,

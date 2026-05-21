@@ -1,4 +1,4 @@
-# 验证矩阵
+﻿# 验证矩阵
 
 最后更新：2026-05-21
 
@@ -23,6 +23,7 @@
 | RV32M 乘除法扩展 | `testcases/rv32i_pipe_muldiv_tb.sv` | `make sim TB_FILE=./testcases/rv32i_pipe_muldiv_tb.sv TOP_NAME=rv32i_pipe_muldiv_tb` | PASS |
 | RV32M decoder 译码边界 | `testcases/rv32i_decoder_muldiv_tb.sv` | `make sim TB_FILE=./testcases/rv32i_decoder_muldiv_tb.sv TOP_NAME=rv32i_decoder_muldiv_tb` | PASS |
 | RV32I/RV32M ISA 基础子集 | `testcases/rv32i_pipe_isa_basic_tb.sv` | `make sim TB_FILE=./testcases/rv32i_pipe_isa_basic_tb.sv TOP_NAME=rv32i_pipe_isa_basic_tb` | PASS |
+| Agent workload baseline | `testcases/rv32i_agent_workload_tb.sv` | `make sim TB_FILE=./testcases/rv32i_agent_workload_tb.sv TOP_NAME=rv32i_agent_workload_tb` | PASS |
 | Trap/CSR | `testcases/rv32i_trap_csr_tb.sv` | `make sim TB_FILE=./testcases/rv32i_trap_csr_tb.sv TOP_NAME=rv32i_trap_csr_tb` | PASS |
 | I-cache | `testcases/rv32i_icache_tb.sv` | `make sim TB_FILE=./testcases/rv32i_icache_tb.sv TOP_NAME=rv32i_icache_tb` | PASS |
 | D-cache | `testcases/rv32i_dcache_tb.sv` | `make sim TB_FILE=./testcases/rv32i_dcache_tb.sv TOP_NAME=rv32i_dcache_tb` | PASS |
@@ -53,6 +54,7 @@
 cd sim
 bash ./regress/run_regression.sh --suite smoke
 bash ./regress/run_regression.sh --suite isa --keep-going
+bash ./regress/run_regression.sh --suite agent --keep-going
 bash ./regress/run_regression.sh --suite core --keep-going
 bash ./regress/run_regression.sh --suite cache --keep-going
 bash ./regress/run_regression.sh --suite soc --keep-going
@@ -115,9 +117,10 @@ MMIO 改动后，至少运行：
 
 ## 最近人工更新
 
-- 2026-05-21：Stage A4 第一版质量检查入口已新增，包含 PowerShell/Bash 脚本、`rv32i_cached_ahb_master_top` 初始 SDC 和 `docs/RV32I_QUALITY_CHECKS.md`。本机已通过 filelist/SDC 基础检查、`all -DryRun` 和 Bash 语法检查；Verilator/Yosys/OpenSTA 真实运行因本机缺工具标记为 `SKIP`。
+- 2026-05-21：用户确认 Agent workload baseline v0.1 `rv32i_agent_workload_tb` VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`、`btb_hit=25`、`btb_miss=22`、`bht_update=47`。该测试覆盖 agent event loop、tool dispatch、token scan、INT8 dot 和 tiny matvec，并已接入 `agent` regression suite。
+- 2026-05-21：Stage A4 第一版质量检查入口已新增，包含 PowerShell/Bash 脚本、`rv32i_cached_ahb_master_top` 初始 SDC 和 `docs/verification/RV32I_QUALITY_CHECKS.md`。本机已通过 filelist/SDC 基础检查、`all -DryRun` 和 Bash 语法检查；Verilator/Yosys/OpenSTA 真实运行因本机缺工具标记为 `SKIP`。
 - 2026-05-21：用户确认 Stage A3 第一版 `rv32i_pipe_isa_basic_tb` VCS PASS：`cycle=476`、`instret=184`、`stall_cycle=190`、`flush_cycle=49`、`branch_count=48`、`branch_mispredict_count=48`。该测试覆盖 RV32I arithmetic/branch/jump/load-store 以及 RV32M mul/div/rem 基础和边界行为，并已接入 `isa/core/full` 回归 suite。
-- 2026-05-20：Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/RV32I_CPU_IP_DELIVERY.md`，并把 README、接口索引和 AHB 文档入口统一到推荐交付边界 `rv32i_cached_ahb_master_top`。本轮只改文档，不需要新增 VCS 测试。
+- 2026-05-20：Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/architecture/RV32I_CPU_IP_DELIVERY.md`，并把 README、接口索引和 AHB 文档入口统一到推荐交付边界 `rv32i_cached_ahb_master_top`。本轮只改文档，不需要新增 VCS 测试。
 - 2026-05-20：用户确认 Stage A2 第六轮 full regression PASS，日志目录为 `sim/log/regress/20260520_173852-full`；本轮将剩余 CPU 程序型 directed tests 一次性迁移到软件镜像流：`rv32i_core_tb`、`rv32i_pipe_icache_tb`、`rv32i_pipe_dcache_tb` 和 `rv32i_pipe_cached_bus_tb`。
 - 2026-05-20：用户确认 Stage A2 第五轮软件镜像迁移后的 `rv32i_pipe_core_tb` 和 `rv32i_trap_csr_tb` 均 VCS PASS；这两个测试默认加载 `software/bin/pipe_core.memh` 与 `software/bin/trap_csr.memh`。
 - 2026-05-20：用户确认 Stage A2 第四轮软件镜像迁移后的 `rv32i_pipe_branch_predict_tb`、`rv32i_pipe_dynamic_branch_predict_tb`、`rv32i_pipe_branch_predict_param_tb` 和 `rv32i_pipe_muldiv_tb` 均 VCS PASS。Linux 回归机暂未配置 `riscv-none-elf-gcc`，因此 `--build-software` 入口会在工具链预检查处停止；不带该选项使用已生成的 MEMH 镜像运行正常。

@@ -12,7 +12,9 @@
 - `ahb`：AHB-Lite bus path 和 AHB master top。
 - `mmio`：timer、UART 和相关 cached/MMIO 测试。
 - `soc`：推荐 CPU subsystem 和 AHB matrix SoC 顶层。
-- `full`：当前全部 directed tests。
+- `isa`：项目内 ISA 基础子集。
+- `agent`：Agent workload baseline 和后续 Agent/NPU 相关 directed tests。
+- `full`：当前已收口的 directed tests；PENDING 测试先放在独立 suite，PASS 后再并入。
 
 ## Windows / PowerShell
 
@@ -29,6 +31,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\sim\regress\run_regression
 -Suite core
 -Suite cache
 -Suite soc
+-Suite isa
+-Suite agent
 -Suite full
 -BuildSoftware
 -KeepGoing

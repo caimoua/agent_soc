@@ -1,4 +1,4 @@
-# RV32I 最小 Trap/CSR 机制说明
+﻿# RV32I 最小 Trap/CSR 机制说明
 
 ## 1. 为什么进入这个阶段
 
@@ -48,7 +48,7 @@ handler 处理完后通过 mret 返回
 - 非对齐 load/store 异常。
 - page fault、access fault。
 
-也就是说，这一阶段仍然只有一个简化的 machine mode。trap 只是一个明确的控制流机制和 CSR 状态保存机制。后续 `timer_irq` 接入和最小 `mstatus/mie/mip` 已记录在 `docs/RV32I_TIMER.md`。I/D 侧 access fault 也已接入同一套 commit trap 框架：instruction access fault 的验证入口是 `sim/testcases/rv32i_cached_instr_access_fault_tb.sv`，load/store access fault 的验证入口是 `sim/testcases/rv32i_cached_access_fault_tb.sv`。这两个 cached fault test 当前默认分别加载 `software/bin/cached_instr_access_fault.memh` 和 `software/bin/cached_access_fault.memh`。
+也就是说，这一阶段仍然只有一个简化的 machine mode。trap 只是一个明确的控制流机制和 CSR 状态保存机制。后续 `timer_irq` 接入和最小 `mstatus/mie/mip` 已记录在 `docs/architecture/RV32I_TIMER.md`。I/D 侧 access fault 也已接入同一套 commit trap 框架：instruction access fault 的验证入口是 `sim/testcases/rv32i_cached_instr_access_fault_tb.sv`，load/store access fault 的验证入口是 `sim/testcases/rv32i_cached_access_fault_tb.sv`。这两个 cached fault test 当前默认分别加载 `software/bin/cached_instr_access_fault.memh` 和 `software/bin/cached_access_fault.memh`。
 
 ## 3. precise exception 是什么
 
@@ -535,7 +535,7 @@ sw x1, 0(x0)      // younger wrong-path store，不应该真正写 memory
 
 ## 11. 和当前 SYSTEM_CSR_MINIMAL 的关系
 
-`docs/SYSTEM_CSR_MINIMAL.md` 记录的是早期最小 SYSTEM/CSR debug 版本：
+`docs/architecture/SYSTEM_CSR_MINIMAL.md` 记录的是早期最小 SYSTEM/CSR debug 版本：
 
 ```text
 ecall/ebreak 只产生 debug pulse
@@ -819,7 +819,7 @@ mcause 保存异常原因
 core 收到 commit_redirect 后让 PC 跳到 mtvec
 ```
 
-timer interrupt 阶段复用了这条 redirect 机制，但 `mcause=0x80000007`，`mepc` 保存当前普通指令提交后的下一条 PC。详细说明见 `docs/RV32I_TIMER.md`。
+timer interrupt 阶段复用了这条 redirect 机制，但 `mcause=0x80000007`，`mepc` 保存当前普通指令提交后的下一条 PC。详细说明见 `docs/architecture/RV32I_TIMER.md`。
 
 ### 12.7 MRET 是怎么返回的
 

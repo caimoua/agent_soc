@@ -1,4 +1,4 @@
-# RV32I 五级流水线 Core 说明
+﻿# RV32I 五级流水线 Core 说明
 
 ## 1. 当前目标
 
@@ -849,7 +849,7 @@ forward_rs2_data     // EX 阶段实际使用的 rs2 数据
 trap/CSR 的详细说明单独放在：
 
 ```text
-docs/RV32I_TRAP_CSR.md
+docs/architecture/RV32I_TRAP_CSR.md
 ```
 
 ## 12. 下一步怎么迭代

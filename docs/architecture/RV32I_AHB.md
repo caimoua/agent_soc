@@ -1,4 +1,4 @@
-# RV32I AHB-Lite Bus Path 说明
+﻿# RV32I AHB-Lite Bus Path 说明
 
 这一阶段新增一条 AHB-Lite 形式的系统总线路径。目标是让当前 simple `valid/ready` 内部总线可以通过标准 AHB address/data phase 访问 ROM、SRAM 和 MMIO，同时不破坏已经通过回归的 `rv32i_mem_bus`。
 
@@ -102,7 +102,7 @@ make sim TB_FILE=./testcases/rv32i_cached_system_ahb_top_tb.sv TOP_NAME=rv32i_ca
 交付级接口、参数、限制和集成检查清单见：
 
 ```text
-docs/RV32I_CPU_IP_DELIVERY.md
+docs/architecture/RV32I_CPU_IP_DELIVERY.md
 ```
 
 内部结构：

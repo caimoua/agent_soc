@@ -1,10 +1,10 @@
-# 项目状态
+﻿# 项目状态
 
 最后更新：2026-05-21
 
-这是后续 Codex 会话的第一入口。继续工作前先读这个文件，再按需读取 `docs/INTERFACE_INDEX.md`、`docs/VERIFICATION_MATRIX.md` 和 `docs/AI_AGENT_MCU_NPU_SOC_ROADMAP.md`，避免每次重新扫描大量 RTL。
+这是后续 Codex 会话的第一入口。继续工作前先读这个文件，再按需读取 `docs/status/INTERFACE_INDEX.md`、`docs/status/VERIFICATION_MATRIX.md`、`docs/roadmap/AI_AGENT_MCU_NPU_SOC_ROADMAP.md` 和 `docs/roadmap/AGENT_SOC_ARCH_V0.md`，避免每次重新扫描大量 RTL。
 
-本仓库是从 `d:\AIoT\cpu_prj` 新开的 AI Agent MCU + NPU SoC 项目。当前 RTL 仍以 RV32IM CPU / AHB-Lite 小 SoC 为可验证起点，后续工作围绕 Agent workload、NPU 功能模型、MMIO matrix accelerator、Agent Accelerator 和 SoC fabric 升级展开。
+本仓库是从 `d:\AIoT\cpu_prj` 新开的 AI Agent MCU + NPU SoC 项目。当前 RTL 仍以 RV32IM CPU / AHB-Lite 小 SoC 为可验证起点，后续工作围绕 Agent workload、NPU 功能模型、MMIO matrix accelerator、Agent Accelerator 和 SoC fabric 升级展开。第一版可执行架构边界见 `docs/roadmap/AGENT_SOC_ARCH_V0.md`。
 
 ## 当前基线
 
@@ -34,7 +34,7 @@ rv32i_cached_ahb_master_top
 
 ## 项目大路线
 
-后续大方向固定为三阶段，详细路线见 `docs/RV32I_PROJECT_ROADMAP.md`。
+后续大方向分为两层：CPU IP 基线继续沿用 `docs/roadmap/RV32I_PROJECT_ROADMAP.md` 的阶段描述；Agent MCU + NPU SoC 新路线以 `docs/roadmap/AI_AGENT_MCU_NPU_SOC_ROADMAP.md` 和 `docs/roadmap/AGENT_SOC_ARCH_V0.md` 为主。
 
 ```text
 Stage A：可交付 CPU IP
@@ -47,7 +47,7 @@ Stage C：性能优化型 CPU core
   最后基于可测量 workload 做分支、取指、cache、总线和 CPI 优化。
 ```
 
-当前仍处于 Stage A。A1 自动化回归、A2 汇编/软件镜像测试流、A3 第一版 ISA 基础测试子集、A4 第一版质量检查入口和 A5 CPU IP 交付文档第一版已经收口。中长期方向已调整为面向本地 AI agent 调度与轻量推理的 RISC-V Agent Core，路线分析见 `docs/RV32I_XUANTIE_AGENT_ROADMAP.md`。新的北极星方案进一步扩展为 RISC-V MCU + NPU + Agent Accelerator SoC，承接文档见 `docs/AI_AGENT_MCU_NPU_SOC_ROADMAP.md`。近期优先级转为：建立 agent workload baseline、建立 NPU/Agent Accelerator 功能模型、固定 lint/综合 warning baseline，以及继续补齐更细的 core/限制说明文档。
+当前 CPU IP 基线的 Stage A 已基本收口：A1 自动化回归、A2 汇编/软件镜像测试流、A3 第一版 ISA 基础测试子集、A4 第一版质量检查入口和 A5 CPU IP 交付文档第一版已经完成。新仓库的近期主线转为 Agent SoC v0：建立 agent workload baseline、建立 NPU/Agent Accelerator 功能模型、固定 lint/综合 warning baseline，以及继续补齐更细的 core/限制说明文档。
 
 ## 已完成
 
@@ -98,14 +98,24 @@ Stage C：性能优化型 CPU core
   - `tools/quality/run_quality_checks.ps1`
   - `tools/quality/run_quality_checks.sh`
   - `project/constraints/rv32i_cached_ahb_master_top.sdc`
-  - `docs/RV32I_QUALITY_CHECKS.md`
+  - `docs/verification/RV32I_QUALITY_CHECKS.md`
   - 支持 filelist/SDC 基础检查，并可选接入 Verilator lint、Yosys synthesis/check 和 OpenSTA timing。
 - 玄铁式 Agent Core 路线分析：
-  - `docs/RV32I_XUANTIE_AGENT_ROADMAP.md`
+  - `docs/roadmap/RV32I_XUANTIE_AGENT_ROADMAP.md`
   - 将后续方向从泛化 CPU/SoC demo 收敛为面向 agent runtime 的调度、控制流、内存访问和轻量 AI 加速。
 - AI Agent MCU + NPU SoC 新路线承接：
-  - `docs/AI_AGENT_MCU_NPU_SOC_ROADMAP.md`
+  - `docs/roadmap/AI_AGENT_MCU_NPU_SOC_ROADMAP.md`
   - 将当前 RV32IM/AHB CPU 子系统定位为新 SoC 的控制面 CPU IP 起点，并把后续工作拆为 agent workload baseline、功能模型、MMIO matrix accelerator、NPU 子系统、Agent Accelerator 和 SoC fabric 升级。
+- Agent SoC v0 可执行架构：
+  - `docs/roadmap/AGENT_SOC_ARCH_V0.md`
+  - 固定 v0.1 agent workload baseline、v0.2 MMIO matrix accelerator 和 v0.3 tool-call detector 的模块边界、地址映射和验收标准。
+- Agent workload baseline v0.1：
+  - `software/asm/agent_workload.S`
+  - `software/bin/agent_workload.memh`
+  - `sim/testcases/rv32i_agent_workload_tb.sv`
+  - `sim/regress/regression_list.txt` 已新增 `agent` suite。
+  - 本机已使用 `D:\AIoT\tools\riscv-none-elf-gcc-15.2.0-1` 和 `D:\AIoT\tools\ezwinports-make` 生成 `agent_workload.memh`。
+  - 用户已确认 VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`、`btb_hit=25`、`btb_miss=22`、`bht_update=47`。
 - 最小 machine-mode trap/CSR 路径：
   - `mtvec`, `mepc`, `mcause`
   - `mstatus.MIE/MPIE`, `mie.MTIE`, `mip.MTIP`
@@ -130,7 +140,7 @@ Stage C：性能优化型 CPU core
   - `rv32i_cached_ahb_master_top`
   - 对外只暴露一个 AHB-Lite master port。
   - 外部 SoC/bus fabric 负责 ROM/SRAM/MMIO decode。
-  - CPU IP 交付说明第一版：`docs/RV32I_CPU_IP_DELIVERY.md`。
+  - CPU IP 交付说明第一版：`docs/architecture/RV32I_CPU_IP_DELIVERY.md`。
 - Clean-room AHB-Lite 1-master / 4-slave matrix SoC wrapper：
   - `rv32i_ahb_lite_matrix_1m4s`
   - `rv32i_ahb_matrix_soc_top`
@@ -221,9 +231,9 @@ Stage C：性能优化型 CPU core
 
 ## 验证状态摘要
 
-详细状态见 `docs/VERIFICATION_MATRIX.md`。
+详细状态见 `docs/status/VERIFICATION_MATRIX.md`。
 
-当前 Phase 6 第一轮 `rv32i_pipe_core` 仿真期 assertion 已加入，并由用户确认 VCS 回归 PASS。Stage A1 自动化回归入口第一版已完成，`smoke/core/cache/soc/full` suite 均已由用户确认 VCS PASS。Stage A2 第一轮已把 cached system / AHB master 相关 directed tests 从手写机器码迁移到软件镜像流，相关 testbench 已由用户确认 VCS PASS。Stage A2 第二轮已迁移 cached timer / UART，并给回归脚本加入软件镜像构建和缺失检查；用户已确认 `mmio` suite VCS PASS。Stage A2 第三轮已迁移 timer IRQ、access fault、instruction access fault 和 misaligned trap 相关 cached directed tests，并已由用户确认 VCS PASS。Stage A2 第四轮已迁移 branch predict 和 RV32M pipeline directed tests，并已由用户确认 VCS PASS。Stage A2 第五轮已迁移 `rv32i_pipe_core_tb` 和 `rv32i_trap_csr_tb` 到软件镜像流，并已由用户确认 VCS PASS。Stage A2 第六轮已把剩余 CPU 程序型 directed tests 一次性迁移到软件镜像流，并已由用户确认 full regression PASS，日志目录为 `sim/log/regress/20260520_173852-full`。Stage A3 第一版项目内 ISA 基础测试子集已新增并接入 `isa/core/full` suite，用户已确认 `rv32i_pipe_isa_basic_tb` VCS PASS：`cycle=476`、`instret=184`、`stall_cycle=190`、`flush_cycle=49`、`branch_count=48`、`branch_mispredict_count=48`。Stage A4 第一版质量检查入口已新增，PowerShell `basic` suite 已通过 filelist/SDC 检查，`all -DryRun` 已验证命令路径，Bash 脚本已通过语法检查；本机未安装 Verilator/Yosys/OpenSTA，真实 lint/synth/timing 运行当前为工具缺失导致的 `SKIP`。Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/RV32I_CPU_IP_DELIVERY.md` 并把 README、接口索引和 AHB 文档入口统一到 `rv32i_cached_ahb_master_top`。Linux 回归机暂未配置 `riscv-none-elf-gcc`，因此 `--build-software` 会停在工具链预检查；使用已生成 MEMH 的普通 `make sim` 路径已确认通过。
+当前 Phase 6 第一轮 `rv32i_pipe_core` 仿真期 assertion 已加入，并由用户确认 VCS 回归 PASS。Stage A1 自动化回归入口第一版已完成，`smoke/core/cache/soc/full` suite 均已由用户确认 VCS PASS。Stage A2 第一轮已把 cached system / AHB master 相关 directed tests 从手写机器码迁移到软件镜像流，相关 testbench 已由用户确认 VCS PASS。Stage A2 第二轮已迁移 cached timer / UART，并给回归脚本加入软件镜像构建和缺失检查；用户已确认 `mmio` suite VCS PASS。Stage A2 第三轮已迁移 timer IRQ、access fault、instruction access fault 和 misaligned trap 相关 cached directed tests，并已由用户确认 VCS PASS。Stage A2 第四轮已迁移 branch predict 和 RV32M pipeline directed tests，并已由用户确认 VCS PASS。Stage A2 第五轮已迁移 `rv32i_pipe_core_tb` 和 `rv32i_trap_csr_tb` 到软件镜像流，并已由用户确认 VCS PASS。Stage A2 第六轮已把剩余 CPU 程序型 directed tests 一次性迁移到软件镜像流，并已由用户确认 full regression PASS，日志目录为 `sim/log/regress/20260520_173852-full`。Stage A3 第一版项目内 ISA 基础测试子集已新增并接入 `isa/core/full` suite，用户已确认 `rv32i_pipe_isa_basic_tb` VCS PASS：`cycle=476`、`instret=184`、`stall_cycle=190`、`flush_cycle=49`、`branch_count=48`、`branch_mispredict_count=48`。Agent workload baseline v0.1 已由用户确认 VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`。Stage A4 第一版质量检查入口已新增，PowerShell `basic` suite 已通过 filelist/SDC 检查，`all -DryRun` 已验证命令路径，Bash 脚本已通过语法检查；本机未安装 Verilator/Yosys/OpenSTA，真实 lint/synth/timing 运行当前为工具缺失导致的 `SKIP`。Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/architecture/RV32I_CPU_IP_DELIVERY.md` 并把 README、接口索引和 AHB 文档入口统一到 `rv32i_cached_ahb_master_top`。Linux 回归机暂未配置 `riscv-none-elf-gcc`，因此 `--build-software` 会停在工具链预检查；使用已生成 MEMH 的普通 `make sim` 路径已确认通过。
 
 ## 设计假设
 
@@ -239,18 +249,19 @@ Stage C：性能优化型 CPU core
 
 ## 下一步候选
 
-1. Stage B1：建立 agent event loop / tool dispatch / token scan / int8 matvec 的 CPU-only workload baseline。
+1. v0.2：实现第一个 APB MMIO matrix accelerator 原型，优先走 scratchpad + polling 闭环，并与 v0.1 CPU-only baseline 对比。
 2. 建立 NPU / Agent Accelerator 的软件功能模型和测试向量，不直接跳到完整 32x32 NPU RTL。
-3. 在 Linux/CI 或本机安装 Verilator/Yosys 后运行 `tools/quality` 的 `lint/synth/all` suite，形成第一版 warning baseline。
-4. 继续补 `docs/RV32I_PIPE_CORE.md` 和 `docs/RV32I_LIMITATIONS.md`，让交付文档更完整。
-5. 根据后续测试增长继续维护自动化回归 suite。
+3. 扩展 agent workload baseline 的结果记录，按 workload 分段统计 cycle/branch/stall。
+4. 在 Linux/CI 或本机安装 Verilator/Yosys 后运行 `tools/quality` 的 `lint/synth/all` suite，形成第一版 warning baseline。
+5. 继续补 `docs/architecture/RV32I_PIPELINE_CORE.md` 和 `docs/architecture/RV32I_LIMITATIONS.md`，让交付文档更完整。
+6. 根据后续测试增长继续维护自动化回归 suite。
 
 ## 上下文规则
 
 后续 Codex 会话：
 
 1. 先读本文件。
-2. 再读 `docs/INTERFACE_INDEX.md`。
+2. 再读 `docs/status/INTERFACE_INDEX.md`。
 3. 再按任务读取相关 RTL/testbench。
 4. 新增测试在用户给出 VCS PASS 前只能标记为 `PENDING`。
-5. 用户确认 PASS 后，再更新 `docs/VERIFICATION_MATRIX.md`、本文件，并提交。
+5. 用户确认 PASS 后，再更新 `docs/status/VERIFICATION_MATRIX.md`、本文件，并提交。

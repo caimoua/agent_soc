@@ -1,4 +1,4 @@
-# RV32M 乘除法扩展
+﻿# RV32M 乘除法扩展
 
 本文记录 `rv32i_pipe_core` 的 RV32M 乘除法扩展实现。
 
@@ -24,7 +24,7 @@ software/asm/pipe_muldiv.S
 software/bin/pipe_muldiv.memh
 ```
 
-testbench 默认从 `../software/bin/pipe_muldiv.memh` 加载，也可以通过 `+IMEM_MEMH=<path>` 覆盖；迁移后的 VCS 状态见 `docs/VERIFICATION_MATRIX.md`。
+testbench 默认从 `../software/bin/pipe_muldiv.memh` 加载，也可以通过 `+IMEM_MEMH=<path>` 覆盖；迁移后的 VCS 状态见 `docs/status/VERIFICATION_MATRIX.md`。
 
 2026-05-19 的工程化重构中，M 扩展识别已从 `rv32i_pipe_core` 顶层并入 `rv32i_decoder`。decoder 单元测试已由用户确认 VCS PASS：
 

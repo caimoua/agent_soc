@@ -1,4 +1,4 @@
-# RV32I 工程化重构计划
+﻿# RV32I 工程化重构计划
 
 最后更新：2026-05-19
 
@@ -310,8 +310,8 @@ perf_flush_event
 1. 小范围 RTL 修改。
 2. 更新 filelist。
 3. 新增或更新 directed test。
-4. 更新 `docs/VERIFICATION_MATRIX.md`，新测试先标 `PENDING`。
-5. 更新相关专题文档和 `docs/PROJECT_STATUS.md`。
+4. 更新 `docs/status/VERIFICATION_MATRIX.md`，新测试先标 `PENDING`。
+5. 更新相关专题文档和 `docs/status/PROJECT_STATUS.md`。
 6. 用户运行 VCS 并给出 PASS log。
 7. 再把矩阵改为 `PASS`，commit 并 push。
 

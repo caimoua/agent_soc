@@ -1,8 +1,10 @@
-# AI Agent MCU + NPU SoC Roadmap
+﻿# AI Agent MCU + NPU SoC Roadmap
 
 最后更新：2026-05-21
 
 本文承接新的项目方向：从当前 RV32IM CPU / 小型 AHB SoC 原型，逐步演进为面向本地 AI Agent 推理的 RISC-V MCU + NPU SoC。
+
+第一版可执行架构见 `docs/roadmap/AGENT_SOC_ARCH_V0.md`。本文保留长期路线和阶段方向，v0 文档负责当前可开工的模块边界、地址映射和验收标准。
 
 一句话定位：
 
@@ -251,11 +253,12 @@ performance counter print
 
 近期不要直接开完整 32x32 NPU RTL。更稳的顺序是：
 
-1. 保持当前 CPU IP 回归稳定。
-2. 建立 `agent_event_loop`、`agent_token_scan`、`agent_int8_matvec` 的 CPU-only baseline。
-3. 建立 NPU / Agent Accelerator 的软件功能模型和测试向量。
-4. 做第一个 MMIO matrix accelerator 原型。
-5. 再根据 benchmark 数据决定 CPU custom ISA、NPU 阵列规模和 SoC fabric 升级。
+1. 以 `docs/roadmap/AGENT_SOC_ARCH_V0.md` 固定 v0.1/v0.2 架构边界。
+2. 保持当前 CPU IP 回归稳定。
+3. 建立 `agent_event_loop`、`agent_token_scan`、`agent_int8_matvec` 的 CPU-only baseline。
+4. 建立 NPU / Agent Accelerator 的软件功能模型和测试向量。
+5. 做第一个 MMIO matrix accelerator 原型。
+6. 再根据 benchmark 数据决定 CPU custom ISA、NPU 阵列规模和 SoC fabric 升级。
 
 这条路径能让每一阶段都有可运行软件、可验证 RTL 和可展示数据，而不是把项目一次性推到不可收敛的大 SoC 状态。
 

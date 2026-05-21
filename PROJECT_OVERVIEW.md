@@ -1,4 +1,4 @@
-# CPU_PRJ 项目概览
+﻿# CPU_PRJ 项目概览
 
 生成日期：2026-05-11
 
@@ -43,7 +43,7 @@
 
 当前 RTL 是一个小型单周期 RV32I 基线。它已经具备取指、译码、寄存器读取、ALU 执行、branch/jump PC 选择、简单 data memory 访问和寄存器写回。
 
-同时已新增五级流水线 core：`rtl/core/rv32i_pipe_core.v`。该版本保留单周期 core 作为 baseline，已验证 IF/ID、ID/EX、EX/MEM、MEM/WB 流水寄存器、写回路径、EX/MEM 和 MEM/WB 到 EX 阶段的 forwarding、`lw` 后紧跟使用结果时的一拍 load-use stall、指令/数据存储器等待停顿、branch/jump redirect 后的错误路径 flush，以及 `instret/stall_cycle/flush_cycle` debug 性能计数器；详细说明见 `docs/RV32I_PIPELINE_CORE.md`。
+同时已新增五级流水线 core：`rtl/core/rv32i_pipe_core.v`。该版本保留单周期 core 作为 baseline，已验证 IF/ID、ID/EX、EX/MEM、MEM/WB 流水寄存器、写回路径、EX/MEM 和 MEM/WB 到 EX 阶段的 forwarding、`lw` 后紧跟使用结果时的一拍 load-use stall、指令/数据存储器等待停顿、branch/jump redirect 后的错误路径 flush，以及 `instret/stall_cycle/flush_cycle` debug 性能计数器；详细说明见 `docs/architecture/RV32I_PIPELINE_CORE.md`。
 
 当前由 `sim/testcases/rv32i_core_tb.sv` 验证的内容：
 
@@ -57,9 +57,9 @@
 
 memory 接口目前仍是教学版：单周期 directed test 中默认 `ready` 恒为 1；流水线 directed test 已加入指令存储器和数据存储器的一拍 wait-state，用来验证 blocking fetch/memory stall。当前已实现 byte、halfword、word 级 load/store，暂未处理非对齐访问异常。
 
-单周期 core 的最小 SYSTEM/CSR 路径当前只实现 `cycle` CSR 只读写回和 `ecall/ebreak` debug 事件；详细说明见 `docs/SYSTEM_CSR_MINIMAL.md`。
+单周期 core 的最小 SYSTEM/CSR 路径当前只实现 `cycle` CSR 只读写回和 `ecall/ebreak` debug 事件；详细说明见 `docs/architecture/SYSTEM_CSR_MINIMAL.md`。
 
-pipeline core 已完成第一版最小 machine trap/CSR 机制，CSR/trap 状态已拆到 `rtl/core/rv32i_pipe_csr.v`，LSU 已拆到 `rtl/core/rv32i_pipe_lsu.v`，hazard/forwarding 已拆到 `rtl/core/rv32i_pipe_hazard.v`，支持 `mtvec/mepc/mcause`、`ecall/ebreak/illegal` trap、`mret` 返回和 commit 阶段 precise exception；设计与实现说明见 `docs/RV32I_TRAP_CSR.md`。
+pipeline core 已完成第一版最小 machine trap/CSR 机制，CSR/trap 状态已拆到 `rtl/core/rv32i_pipe_csr.v`，LSU 已拆到 `rtl/core/rv32i_pipe_lsu.v`，hazard/forwarding 已拆到 `rtl/core/rv32i_pipe_hazard.v`，支持 `mtvec/mepc/mcause`、`ecall/ebreak/illegal` trap、`mret` 返回和 commit 阶段 precise exception；设计与实现说明见 `docs/architecture/RV32I_TRAP_CSR.md`。
 
 ## 4. 仿真入口
 
@@ -98,4 +98,4 @@ make clean
 5. 加入 cache 或分支预测。
 6. 做一个小型总线式 SoC wrapper。
 
-详细计划见 `docs/RV32I_CPU_PLAN.md`。
+详细计划见 `docs/roadmap/RV32I_CPU_PLAN.md`。

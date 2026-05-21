@@ -1,8 +1,8 @@
-# RV32I 项目路线图
+﻿# RV32I 项目路线图
 
 最后更新：2026-05-21
 
-本文记录项目后续的大方向。当前策略是先把已有 CPU 做成可交付 IP，再把它推进为面向本地 AI agent 调度与轻量推理的处理器子系统。玄铁式 agent 路线分析见 `docs/RV32I_XUANTIE_AGENT_ROADMAP.md`。新的 MCU + NPU + Agent Accelerator SoC 北极星路线见 `docs/AI_AGENT_MCU_NPU_SOC_ROADMAP.md`。
+本文记录项目后续的大方向。当前策略是先把已有 CPU 做成可交付 IP，再把它推进为面向本地 AI agent 调度与轻量推理的处理器子系统。玄铁式 agent 路线分析见 `docs/roadmap/RV32I_XUANTIE_AGENT_ROADMAP.md`。新的 MCU + NPU + Agent Accelerator SoC 北极星路线见 `docs/roadmap/AI_AGENT_MCU_NPU_SOC_ROADMAP.md`，第一版可执行架构见 `docs/roadmap/AGENT_SOC_ARCH_V0.md`。
 
 ## 路线总览
 
@@ -188,7 +188,7 @@ software/bin/
 
 - 已新增 `tools/quality/run_quality_checks.ps1` 和 `tools/quality/run_quality_checks.sh`。
 - 已新增 `project/constraints/rv32i_cached_ahb_master_top.sdc`。
-- 已新增 `docs/RV32I_QUALITY_CHECKS.md`。
+- 已新增 `docs/verification/RV32I_QUALITY_CHECKS.md`。
 - PowerShell `basic` suite 已通过 filelist / SDC 检查。
 - PowerShell `all -DryRun` 已验证 lint / synth / timing 命令路径。
 - Bash 脚本已通过语法检查。
@@ -202,12 +202,12 @@ software/bin/
 
 建议文档：
 
-- `docs/PROJECT_STATUS.md`
-- `docs/INTERFACE_INDEX.md`
-- `docs/VERIFICATION_MATRIX.md`
-- `docs/RV32I_CPU_IP_DELIVERY.md`
-- `docs/RV32I_PIPE_CORE.md`
-- `docs/RV32I_LIMITATIONS.md`
+- `docs/status/PROJECT_STATUS.md`
+- `docs/status/INTERFACE_INDEX.md`
+- `docs/status/VERIFICATION_MATRIX.md`
+- `docs/architecture/RV32I_CPU_IP_DELIVERY.md`
+- `docs/architecture/RV32I_PIPELINE_CORE.md`
+- `docs/architecture/RV32I_LIMITATIONS.md`
 
 验收标准：
 
@@ -217,8 +217,8 @@ software/bin/
 
 当前状态：
 
-- `docs/RV32I_CPU_IP_DELIVERY.md` 已新增，第一版聚焦 `rv32i_cached_ahb_master_top` 的参数、AHB-Lite master 端口、外部 SoC 职责、debug/perf 端口、支持能力和限制。
-- `docs/INTERFACE_INDEX.md`、`docs/RV32I_AHB.md`、`README.md` 和 `docs/PROJECT_STATUS.md` 已指向该交付边界。
+- `docs/architecture/RV32I_CPU_IP_DELIVERY.md` 已新增，第一版聚焦 `rv32i_cached_ahb_master_top` 的参数、AHB-Lite master 端口、外部 SoC 职责、debug/perf 端口、支持能力和限制。
+- `docs/status/INTERFACE_INDEX.md`、`docs/architecture/RV32I_AHB.md`、`README.md` 和 `docs/status/PROJECT_STATUS.md` 已指向该交付边界。
 
 ## Stage B：可运行 SoC / FPGA demo
 
@@ -338,9 +338,10 @@ A1 自动化回归、A2 汇编软件镜像流、A3 第一版项目内 ISA 基础
 
 Stage A / Agent SoC 路线的推荐近期顺序：
 
-1. 建立 agent event loop、tool dispatch、token scan 和 int8 matvec 的 CPU-only workload baseline。
-2. 建立 NPU / Agent Accelerator 的软件功能模型和测试向量。
-3. 在 Linux/CI 或本机安装 Verilator/Yosys 后运行 Stage A4 的 `lint/synth/all` suite，形成第一版 warning baseline。
-4. 继续补 `docs/RV32I_PIPE_CORE.md` 和 `docs/RV32I_LIMITATIONS.md`。
-5. 根据后续测试增长继续维护自动化回归 suite。
-6. 在 benchmark 和功能模型稳定后，再展开 MMIO matrix accelerator、NPU 子系统和 SoC fabric 升级。
+1. 建立 `docs/roadmap/AGENT_SOC_ARCH_V0.md`，固定 v0.1/v0.2 模块边界和验收标准。
+2. 建立 agent event loop、tool dispatch、token scan 和 int8 matvec 的 CPU-only workload baseline。
+3. 建立 NPU / Agent Accelerator 的软件功能模型和测试向量。
+4. 在 Linux/CI 或本机安装 Verilator/Yosys 后运行 Stage A4 的 `lint/synth/all` suite，形成第一版 warning baseline。
+5. 继续补 `docs/architecture/RV32I_PIPELINE_CORE.md` 和 `docs/architecture/RV32I_LIMITATIONS.md`。
+6. 根据后续测试增长继续维护自动化回归 suite。
+7. 在 benchmark 和功能模型稳定后，再展开 MMIO matrix accelerator、NPU 子系统和 SoC fabric 升级。

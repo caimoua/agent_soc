@@ -1,4 +1,4 @@
-# RV32I 分支预测
+﻿# RV32I 分支预测
 
 本文记录 `rv32i_pipe_core` 当前的分支预测实现。BHT/BTB 逻辑已经抽成独立 `rv32i_branch_predictor` 模块，core 只保存预测 PC 和 fetch-time BTB hit token。
 
@@ -63,7 +63,7 @@ software/asm/pipe_branch_predict_param.S
 software/bin/pipe_branch_predict_param.memh
 ```
 
-对应 testbench 默认从这些 `*.memh` 加载指令，也可以通过 `+IMEM_MEMH=<path>` 覆盖；迁移后的 VCS 状态见 `docs/VERIFICATION_MATRIX.md`。
+对应 testbench 默认从这些 `*.memh` 加载指令，也可以通过 `+IMEM_MEMH=<path>` 覆盖；迁移后的 VCS 状态见 `docs/status/VERIFICATION_MATRIX.md`。
 
 已确认的动态预测 PASS 摘要：
 

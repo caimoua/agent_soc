@@ -1,4 +1,4 @@
-# RV32I Cached System Top 说明
+﻿# RV32I Cached System Top 说明
 
 这一阶段把 `rv32i_pipe_cached_bus_tb` 里面手工搭出来的连接关系，提升成一个正式 RTL 顶层：
 
@@ -221,7 +221,7 @@ make sim TB_FILE=./testcases/rv32i_cached_system_top_tb.sv TOP_NAME=rv32i_cached
 说明见：
 
 ```text
-docs/RV32I_TIMER.md
+docs/architecture/RV32I_TIMER.md
 ```
 
 `timer_irq` 也已经通过 `rv32i_cached_system_top` 输入 core，并接入 pipeline 的 trap/CSR 框架，形成 machine timer interrupt。对应验证入口是：
@@ -251,7 +251,7 @@ sim/testcases/rv32i_cached_instr_access_fault_tb.sv
 说明见：
 
 ```text
-docs/RV32I_UART.md
+docs/architecture/RV32I_UART.md
 ```
 
 对应验证入口是：

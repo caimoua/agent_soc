@@ -1,4 +1,4 @@
-# Software 目录
+﻿# Software 目录
 
 ## 汇编到 MEMH 流程
 
@@ -41,11 +41,13 @@ core_smoke
 pipe_icache
 pipe_dcache
 pipe_cached_bus
+isa_basic
+agent_workload
 ```
 
 `ahb_matrix_*` 程序使用 `linker/rv32i_flash.ld`，从 `0x0800_0000` flash slot 启动。`cached_*` 程序使用 `linker/rv32i_rom0.ld`，从 `0x0000_0000` ROM slot 启动，供 cached system wrapper 类 testbench 加载。
 
-`cached_timer_irq` 使用 CSR 汇编助记符，Makefile 会对该目标单独使用 `-march=rv32i_zicsr`。`pipe_muldiv` 使用 RV32M 助记符，Makefile 会对该目标单独使用 `-march=rv32im`。其他 trap/fault/CSR 测试为了保持 RV32I-only 编译路径，CSR/MRET 指令仍用 `.word` 写入。
+`cached_timer_irq` 使用 CSR 汇编助记符，Makefile 会对该目标单独使用 `-march=rv32i_zicsr`。`pipe_muldiv`、`isa_basic` 和 `agent_workload` 使用 RV32M 助记符，Makefile 会对这些目标单独使用 `-march=rv32im`。其他 trap/fault/CSR 测试为了保持 RV32I-only 编译路径，CSR/MRET 指令仍用 `.word` 写入。
 
 默认工具链前缀是 `riscv-none-elf`，对应 xPack RISC-V embedded GCC。可以按本机安装情况覆盖：
 
@@ -55,7 +57,7 @@ make TOOLCHAIN_PREFIX=riscv64-unknown-elf
 
 `bin/*.memh` 可以提交，用来保证仿真环境没有本地 RISC-V 工具链时仍能跑现有 test。`build/`、`bin/*.elf`、`bin/*.bin` 和 map 文件不提交。
 
-更多安装说明见 `docs/RISCV_TOOLCHAIN.md`。
+更多安装说明见 `docs/tooling/RISCV_TOOLCHAIN.md`。
 
 这个目录用于放 CPU 测试程序。
 

@@ -1,4 +1,4 @@
-# RV32I 内部 Memory Bus 说明
+﻿# RV32I 内部 Memory Bus 说明
 
 这一阶段开始把 I-cache、D-cache 后面的存储系统边界搭起来。前面 cache testbench 里，I-cache 直接接 instruction memory，D-cache 直接接 data memory；这样能验证 cache 自己，但还不像一个小 SoC。
 
@@ -60,8 +60,8 @@ filelist/cpu_filelist/bus_rtl.f
 sim/testcases/rv32i_mem_bus_tb.sv
 sim/testcases/rv32i_pipe_cached_bus_tb.sv
 sim/testcases/rv32i_cached_system_top_tb.sv
-docs/RV32I_MEM_BUS.md
-docs/RV32I_CACHED_SYSTEM_TOP.md
+docs/architecture/RV32I_MEM_BUS.md
+docs/architecture/RV32I_CACHED_SYSTEM_TOP.md
 ```
 
 `sim/filelist.f` 已经加入 `bus_rtl.f`，所以仿真会自动编译 `rtl/bus` 下的总线模块。
@@ -302,7 +302,7 @@ cd /home2/kairos18/workspace/cpu_prj/sim
 make sim TB_FILE=./testcases/rv32i_cached_system_top_tb.sv TOP_NAME=rv32i_cached_system_top_tb
 ```
 
-这个 testbench 不再手工实例化 core/cache/bus，而是只实例化 `rv32i_cached_system_top`。它用于验证正式系统顶层 wrapper 的端口和连接关系。说明见 `docs/RV32I_CACHED_SYSTEM_TOP.md`。
+这个 testbench 不再手工实例化 core/cache/bus，而是只实例化 `rv32i_cached_system_top`。它用于验证正式系统顶层 wrapper 的端口和连接关系。说明见 `docs/architecture/RV32I_CACHED_SYSTEM_TOP.md`。
 
 ## 12. 当前限制
 
