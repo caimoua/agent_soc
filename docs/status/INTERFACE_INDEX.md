@@ -112,8 +112,10 @@ APB 外设：
 新增中断/状态输出：
 
 - `timer_irq`：已接入 CPU machine timer interrupt，同时作为 top-level debug/output。
-- `agent_matrix_irq`：v0.2a 先作为 top-level output 暴露，尚未接入 CPU trap/interrupt 路径。
-- `tool_call_irq`：v0.3 先作为 top-level output 暴露，尚未接入 CPU trap/interrupt 路径。
+- `agent_matrix_irq`：Agent Matrix Accelerator 原始 IRQ 输出。
+- `tool_call_irq`：Tool-call Detector 原始 IRQ 输出。
+- `cpu_timer_irq`：v0.4 聚合后的 CPU interrupt 输入，当前由 `timer_irq | agent_matrix_irq | tool_call_irq` 生成并接到 CPU MTIP 路径。
+- `dbg_agent_irq_status`：v0.4 IRQ aggregator debug status，bit0 raw timer、bit1 matrix、bit2 tool-call、bit3 aggregated CPU IRQ。
 - `dbg_matrix_m0_grant_count`：CPU master AHB grant count。
 - `dbg_matrix_m1_grant_count`：accelerator master AHB grant count。
 
@@ -502,3 +504,20 @@ Debug 输出：
 - `dbg_match_count`
 - `dbg_token_count`
 - `dbg_last_token`
+
+### `rv32i_agent_irq_aggregator`
+
+文件：`rtl/accel/rv32i_agent_irq_aggregator.v`
+
+用途：Agent SoC v0.4 的最小 IRQ 聚合层。当前 CPU CSR 只实现 MTIP/MTIE，所以该模块先把 raw timer、Agent Matrix Accelerator 和 Tool-call Detector IRQ 聚合到 CPU 的 `timer_irq` 输入。CPU handler 仍看到 `mcause=0x80000007`，真实来源由外设 `IRQ_STATUS` 判断。
+
+输入：
+
+- `timer_irq`
+- `agent_matrix_irq`
+- `tool_call_irq`
+
+输出：
+
+- `cpu_timer_irq`：`timer_irq | agent_matrix_irq | tool_call_irq`
+- `dbg_status`：bit0 raw timer、bit1 matrix、bit2 tool-call、bit3 aggregated CPU IRQ

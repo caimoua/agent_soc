@@ -61,7 +61,7 @@ Base：`0x4200_2000`
 | `0x140` | `SCRATCH_B` | 1 个 word，打包 4 个 int8 vector 元素 |
 | `0x180` - `0x18c` | `RESULT` | 4 个 signed int32 result |
 
-`CTRL.clear` 会同时清 `done` 和 `irq_pending`。`IRQ_CLEAR` 只清 `irq_pending`，保留 `done`，方便软件先确认计算完成再单独清中断状态。`agent_matrix_irq` 当前从 SoC top 暴露为 output，但尚未接入 CPU trap/interrupt 路径。
+`CTRL.clear` 会同时清 `done` 和 `irq_pending`。`IRQ_CLEAR` 只清 `irq_pending`，保留 `done`，方便软件先确认计算完成再单独清中断状态。`agent_matrix_irq` 当前从 SoC top 暴露为原始 IRQ output；v0.4 通过 Agent IRQ Aggregator 聚合到 CPU MTIP 路径。
 
 ## 4. 软件镜像
 
@@ -107,7 +107,7 @@ make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_soc_tb.sv TOP_NAME=rv32i_a
 make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_sram_soc_tb
 ```
 
-当前状态：两个 directed tests 都是 `PENDING`，等待 VCS 环境确认。确认 PASS 后需要更新：
+当前状态：两个 directed tests 已由用户通过 `agent` regression 确认 PASS。
 
 - `docs/status/VERIFICATION_MATRIX.md`
 - `docs/status/PROJECT_STATUS.md`

@@ -31,7 +31,7 @@ rv32i_ahb_matrix_apb_soc_top
 - CPU 写 `TOKEN_IN` 时，detector 将 token 推入 8-entry history。
 - 每次 token 写入后，硬件比较最近 `PATTERN_LEN` 个 token 是否等于 pattern。
 - 命中后置位 `STATUS.match`、`IRQ_STATUS.pending`，并累加 `MATCH_COUNT`。
-- `tool_call_irq` 当前作为 SoC top output 暴露，尚未接入 CPU trap/interrupt 路径。
+- `tool_call_irq` 作为 SoC top 原始 IRQ 输出；v0.4 通过 Agent IRQ Aggregator 聚合到 CPU MTIP 路径。
 
 ## 3. 寄存器
 
@@ -82,4 +82,22 @@ cd sim
 make sim TB_FILE=./testcases/rv32i_tool_call_detector_soc_tb.sv TOP_NAME=rv32i_tool_call_detector_soc_tb
 ```
 
-当前状态：`PENDING`，等待 VCS 环境确认。
+当前状态：`PASS`，用户已通过 `agent` regression 确认 polling / IRQ pending / IRQ clear directed test。
+
+## 6. IRQ 闭环
+
+v0.4 已新增 Agent IRQ Aggregator，把 `tool_call_irq` 先聚合到 CPU MTIP 路径：
+
+```text
+tool_call_irq -> rv32i_agent_irq_aggregator -> cpu_timer_irq -> CPU MTIP
+```
+
+对应软件和 testbench：
+
+```text
+software/asm/tool_call_detector_irq.S
+software/bin/tool_call_detector_irq.memh
+sim/testcases/rv32i_tool_call_detector_irq_soc_tb.sv
+```
+
+当前 IRQ directed test 状态：`PENDING`，等待 VCS 环境确认。

@@ -51,6 +51,7 @@ module rv32i_ahb_matrix_apb_soc_top #(
   output wire        timer_irq,
   output wire        agent_matrix_irq,
   output wire        tool_call_irq,
+  output wire        cpu_timer_irq,
 
   output wire [31:0] dbg_pc,
   output wire [31:0] dbg_cycle,
@@ -79,6 +80,7 @@ module rv32i_ahb_matrix_apb_soc_top #(
   output wire        dbg_apb_decode_error,
   output wire [31:0] dbg_matrix_m0_grant_count,
   output wire [31:0] dbg_matrix_m1_grant_count,
+  output wire [31:0] dbg_agent_irq_status,
 
   output wire [31:0] dbg_timer_mtime_lo,
   output wire [31:0] dbg_timer_mtime_hi,
@@ -183,7 +185,7 @@ module rv32i_ahb_matrix_apb_soc_top #(
   ) u_matrix_soc (
     .clk                    (clk),
     .rst_n                  (rst_n),
-    .timer_irq              (timer_irq),
+    .timer_irq              (cpu_timer_irq),
     .flash_hsel             (flash_hsel),
     .flash_haddr            (flash_haddr),
     .flash_hburst           (flash_hburst),
@@ -377,6 +379,14 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .dbg_mtimecmp_lo  (dbg_timer_mtimecmp_lo),
     .dbg_mtimecmp_hi  (dbg_timer_mtimecmp_hi),
     .dbg_ctrl         (dbg_timer_ctrl)
+  );
+
+  rv32i_agent_irq_aggregator u_agent_irq_aggregator (
+    .timer_irq        (timer_irq),
+    .agent_matrix_irq (agent_matrix_irq),
+    .tool_call_irq    (tool_call_irq),
+    .cpu_timer_irq    (cpu_timer_irq),
+    .dbg_status       (dbg_agent_irq_status)
   );
 
   rv32i_uart u_uart (

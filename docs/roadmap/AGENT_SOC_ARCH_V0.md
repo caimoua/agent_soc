@@ -44,6 +44,8 @@ rv32i_ahb_matrix_apb_soc_top
     rv32i_timer
     rv32i_uart
     rv32i_agent_matrix_accel
+    rv32i_tool_call_detector
+  rv32i_agent_irq_aggregator
 ```
 
 v0 新增模块优先挂在 APB 外设空间，避免一开始就重构总线。
@@ -324,7 +326,65 @@ Base：`0x4200_3000`
 - polling path 通过。
 - irq path 通过后，接入 timer IRQ 之外的第二类外设中断设计讨论。
 
-## 8. 功能模型目录
+### 7.4 当前 v0.3 实现
+
+当前代码已经落地 Tool-call Detector polling 路径：
+
+```text
+rtl/accel/rv32i_tool_call_detector.v
+software/asm/tool_call_detector.S
+software/bin/tool_call_detector.memh
+sim/testcases/rv32i_tool_call_detector_soc_tb.sv
+```
+
+用户已通过 `agent` regression 确认 polling/IRQ pending/IRQ clear directed test PASS。
+
+## 8. v0.4：Agent IRQ Aggregator
+
+v0.4 的任务是先把 Agent 外设的 IRQ 接入 CPU trap/interrupt 闭环，不在这一轮重构 CSR 为完整 MEI/PLIC/CLIC。
+
+当前 CPU 只实现 MTIP/MTIE，因此 v0.4 使用过渡式聚合：
+
+```text
+timer_irq | agent_matrix_irq | tool_call_irq -> cpu_timer_irq -> CPU MTIP
+```
+
+CPU handler 看到的 `mcause` 仍是：
+
+```text
+0x80000007
+```
+
+真实来源由 handler 读取外设 `IRQ_STATUS` 判断。这个方案让 tool-call 命中可以立刻打断 CPU 主循环，同时保留后续升级独立 external interrupt / CLIC 的空间。
+
+### 8.1 当前 v0.4 实现
+
+```text
+rtl/accel/rv32i_agent_irq_aggregator.v
+software/asm/tool_call_detector_irq.S
+software/bin/tool_call_detector_irq.memh
+sim/testcases/rv32i_tool_call_detector_irq_soc_tb.sv
+docs/architecture/AGENT_IRQ_AGGREGATOR.md
+```
+
+`rv32i_ahb_matrix_apb_soc_top` 新增输出：
+
+```text
+cpu_timer_irq
+dbg_agent_irq_status
+```
+
+### 8.2 v0.4 验收标准
+
+- Tool-call Detector 命中后 `tool_call_irq` 拉高。
+- IRQ aggregator 拉高 `cpu_timer_irq`。
+- CPU 进入 handler，`mcause=0x80000007`，`mip.MTIP=1`。
+- handler 读取 Tool-call Detector `IRQ_STATUS=1`，清 pending 后 `tool_call_irq/cpu_timer_irq` 归零。
+- `mret` 返回主程序并到达 PASS 标志。
+
+当前状态：directed test 已接入 `agent` suite，等待 VCS 确认。
+
+## 9. 功能模型目录
 
 v0.1 开始建议新增：
 
@@ -345,7 +405,7 @@ model/
 - 简化 KV ring buffer 地址生成。
 - 后续再扩 RMSNorm / Softmax / RoPE。
 
-## 9. 回归和文档
+## 10. 回归和文档
 
 新增测试在用户用 VCS 确认前，`docs/status/VERIFICATION_MATRIX.md` 只能标记为 `PENDING`。
 
@@ -365,7 +425,7 @@ rv32i_tool_call_detector_tb
 
 其中后两个等 RTL 存在后再加入。
 
-## 10. 近期执行顺序
+## 11. 近期执行顺序
 
 第一步：
 

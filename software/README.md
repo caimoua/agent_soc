@@ -26,6 +26,7 @@ ahb_matrix_apb_soc
 agent_matrix_accel
 agent_matrix_accel_sram
 tool_call_detector
+tool_call_detector_irq
 cached_system_smoke
 cached_ahb_master
 cached_timer
@@ -50,7 +51,7 @@ agent_workload
 
 `ahb_matrix_*` 程序使用 `linker/rv32i_flash.ld`，从 `0x0800_0000` flash slot 启动。`cached_*` 程序使用 `linker/rv32i_rom0.ld`，从 `0x0000_0000` ROM slot 启动，供 cached system wrapper 类 testbench 加载。
 
-`cached_timer_irq` 使用 CSR 汇编助记符，Makefile 会对该目标单独使用 `-march=rv32i_zicsr`。`pipe_muldiv`、`isa_basic` 和 `agent_workload` 使用 RV32M 助记符，Makefile 会对这些目标单独使用 `-march=rv32im`。其他 trap/fault/CSR 测试为了保持 RV32I-only 编译路径，CSR/MRET 指令仍用 `.word` 写入。
+`cached_timer_irq` 和 `tool_call_detector_irq` 使用 CSR 汇编助记符，Makefile 会对这些目标单独使用 `-march=rv32i_zicsr`。`pipe_muldiv`、`isa_basic` 和 `agent_workload` 使用 RV32M 助记符，Makefile 会对这些目标单独使用 `-march=rv32im`。其他 trap/fault/CSR 测试为了保持 RV32I-only 编译路径，CSR/MRET 指令仍用 `.word` 写入。
 
 默认工具链前缀是 `riscv-none-elf`，对应 xPack RISC-V embedded GCC。可以按本机安装情况覆盖：
 
