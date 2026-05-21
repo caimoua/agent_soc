@@ -64,8 +64,8 @@ v0 预留新增 APB 外设：
 
 | 地址范围 | 用途 | 目标阶段 |
 | --- | --- | --- |
-| `0x4200_2000` | Agent Matrix Accelerator | v0.2a/v0.2b 已接入，VCS 待确认 |
-| `0x4200_3000` | Tool-call Detector | v0.3 已接入，VCS 待确认 |
+| `0x4200_2000` | Agent Matrix Accelerator | v0.2a/v0.2b 已接入并由 VCS 确认 |
+| `0x4200_3000` | Tool-call Detector | v0.3 已接入并由 VCS 确认 |
 | `0x4200_4000` | Agent perf / event counter window | v0.3+ |
 
 长期 SoC 目标中的 `0xE000_0000` NPU 控制空间和 `0xF000_0000` Agent Accelerator 控制空间暂时只保留在北极星路线里，v0 不急着切换到该地址图。
@@ -274,7 +274,7 @@ rv32i_ahb_matrix_apb_soc_top
 4x4 signed int8 matrix * 4x1 signed int8 vector -> 4x1 signed int32 result
 ```
 
-软件 smoke 程序会写入 4 行 matrix 和 1 个 vector，启动 accelerator，polling `STATUS.done`，检查 4 个结果和 checksum，然后测试 `IRQ_STATUS/IRQ_CLEAR`。scratchpad test 只通过 APB window 搬数据；SRAM-mode test 由 CPU 写 SRAM input，再由 accelerator 作为第二 AHB master 读 SRAM、写 SRAM result。验证矩阵中这两个 SoC tests 当前为 `PENDING`，等 VCS PASS 后记录 cycle/instret 数据。
+软件 smoke 程序会写入 4 行 matrix 和 1 个 vector，启动 accelerator，polling `STATUS.done`，检查 4 个结果和 checksum，然后测试 `IRQ_STATUS/IRQ_CLEAR`。scratchpad test 只通过 APB window 搬数据；SRAM-mode test 由 CPU 写 SRAM input，再由 accelerator 作为第二 AHB master 读 SRAM、写 SRAM result。用户已通过 `agent` regression 确认这两个 SoC tests PASS。
 
 ### 6.5 v0.2 验收标准
 
