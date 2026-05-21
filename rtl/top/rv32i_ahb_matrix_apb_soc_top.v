@@ -76,6 +76,8 @@ module rv32i_ahb_matrix_apb_soc_top #(
   output wire        dbg_cpu_bus_error,
   output wire        dbg_matrix_decode_error,
   output wire        dbg_apb_decode_error,
+  output wire [31:0] dbg_matrix_m0_grant_count,
+  output wire [31:0] dbg_matrix_m1_grant_count,
 
   output wire [31:0] dbg_timer_mtime_lo,
   output wire [31:0] dbg_timer_mtime_hi,
@@ -140,6 +142,26 @@ module rv32i_ahb_matrix_apb_soc_top #(
   wire        agent_matrix_ready;
   wire [31:0] agent_matrix_rdata;
 
+  wire        agent_matrix_mem_valid;
+  wire        agent_matrix_mem_write;
+  wire [31:0] agent_matrix_mem_addr;
+  wire [31:0] agent_matrix_mem_wdata;
+  wire [3:0]  agent_matrix_mem_wstrb;
+  wire        agent_matrix_mem_ready;
+  wire [31:0] agent_matrix_mem_rdata;
+  wire        agent_matrix_mem_error;
+
+  wire [31:0] accel_haddr;
+  wire [2:0]  accel_hburst;
+  wire [3:0]  accel_hprot;
+  wire [2:0]  accel_hsize;
+  wire [1:0]  accel_htrans;
+  wire [31:0] accel_hwdata;
+  wire        accel_hwrite;
+  wire [31:0] accel_hrdata;
+  wire        accel_hready;
+  wire [1:0]  accel_hresp;
+
   rv32i_ahb_matrix_soc_top #(
     .ICACHE_INDEX_BITS(ICACHE_INDEX_BITS),
     .DCACHE_INDEX_BITS(DCACHE_INDEX_BITS),
@@ -197,6 +219,16 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .apb_periph_hrdata      (apb_hrdata),
     .apb_periph_hreadyout   (apb_hreadyout),
     .apb_periph_hresp       (apb_hresp),
+    .accel_haddr            (accel_haddr),
+    .accel_hburst           (accel_hburst),
+    .accel_hprot            (accel_hprot),
+    .accel_hsize            (accel_hsize),
+    .accel_htrans           (accel_htrans),
+    .accel_hwdata           (accel_hwdata),
+    .accel_hwrite           (accel_hwrite),
+    .accel_hrdata           (accel_hrdata),
+    .accel_hready           (accel_hready),
+    .accel_hresp            (accel_hresp),
     .dbg_pc                 (dbg_pc),
     .dbg_cycle              (dbg_cycle),
     .dbg_instret            (dbg_instret),
@@ -219,7 +251,32 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .dbg_bus_i_grant_count  (dbg_bus_i_grant_count),
     .dbg_bus_d_grant_count  (dbg_bus_d_grant_count),
     .dbg_cpu_bus_error      (dbg_cpu_bus_error),
-    .dbg_matrix_decode_error(dbg_matrix_decode_error)
+    .dbg_matrix_decode_error(dbg_matrix_decode_error),
+    .dbg_matrix_m0_grant_count(dbg_matrix_m0_grant_count),
+    .dbg_matrix_m1_grant_count(dbg_matrix_m1_grant_count)
+  );
+
+  rv32i_simple_to_ahb u_agent_matrix_mem_to_ahb (
+    .clk       (clk),
+    .rst_n     (rst_n),
+    .valid     (agent_matrix_mem_valid),
+    .write     (agent_matrix_mem_write),
+    .addr      (agent_matrix_mem_addr),
+    .wdata     (agent_matrix_mem_wdata),
+    .wstrb     (agent_matrix_mem_wstrb),
+    .ready     (agent_matrix_mem_ready),
+    .rdata     (agent_matrix_mem_rdata),
+    .error     (agent_matrix_mem_error),
+    .haddr     (accel_haddr),
+    .hburst    (accel_hburst),
+    .hprot     (accel_hprot),
+    .hsize     (accel_hsize),
+    .htrans    (accel_htrans),
+    .hwdata    (accel_hwdata),
+    .hwrite    (accel_hwrite),
+    .hrdata    (accel_hrdata),
+    .hready    (accel_hready),
+    .hresp     (accel_hresp)
   );
 
   rv32i_ahb_to_apb u_ahb_to_apb (
@@ -328,6 +385,14 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .wstrb           (agent_matrix_wstrb),
     .ready           (agent_matrix_ready),
     .rdata           (agent_matrix_rdata),
+    .mem_valid       (agent_matrix_mem_valid),
+    .mem_write       (agent_matrix_mem_write),
+    .mem_addr        (agent_matrix_mem_addr),
+    .mem_wdata       (agent_matrix_mem_wdata),
+    .mem_wstrb       (agent_matrix_mem_wstrb),
+    .mem_ready       (agent_matrix_mem_ready),
+    .mem_rdata       (agent_matrix_mem_rdata),
+    .mem_error       (agent_matrix_mem_error),
     .irq             (agent_matrix_irq),
     .dbg_status      (dbg_agent_matrix_status),
     .dbg_result0     (dbg_agent_matrix_result0),

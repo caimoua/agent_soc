@@ -127,6 +127,15 @@ Stage C：性能优化型 CPU core
   - `sim/testcases/rv32i_agent_matrix_accel_soc_tb.sv`
   - `sim/regress/regression_list.txt` 已把该 test 接入 `agent` suite。
   - 当前本地已补齐代码和静态入口，VCS 真实结果等待用户确认，验证矩阵状态为 `PENDING`。
+- Agent matrix accelerator v0.2b SRAM mode：
+  - `rtl/bus/rv32i_ahb_lite_matrix_2m4s.v`
+  - `rv32i_ahb_matrix_soc_top` 已从 1-master matrix 升级到 2-master front-end，CPU 为 M0，accelerator 为 M1。
+  - `rv32i_agent_matrix_accel` 已新增 SRAM-mode 寄存器：`SRC_A/SRC_B/DST/STRIDE_A/STRIDE_B/STRIDE_D/FLAGS`。
+  - `FLAGS.bit0=1` 时，accelerator 通过 simple-to-AHB master 读取 SRAM matrix/vector，并把 int32 result 写回 SRAM。
+  - `software/asm/agent_matrix_accel_sram.S`
+  - `software/bin/agent_matrix_accel_sram.memh`
+  - `sim/testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv`
+  - 当前本地已通过 filelist/SDC 基础检查和 `agent` regression dry-run，VCS 真实结果等待用户确认，验证矩阵状态为 `PENDING`。
 - 最小 machine-mode trap/CSR 路径：
   - `mtvec`, `mepc`, `mcause`
   - `mstatus.MIE/MPIE`, `mie.MTIE`, `mip.MTIP`
@@ -245,7 +254,7 @@ Stage C：性能优化型 CPU core
 
 详细状态见 `docs/status/VERIFICATION_MATRIX.md`。
 
-当前 Phase 6 第一轮 `rv32i_pipe_core` 仿真期 assertion 已加入，并由用户确认 VCS 回归 PASS。Stage A1 自动化回归入口第一版已完成，`smoke/core/cache/soc/full` suite 均已由用户确认 VCS PASS。Stage A2 第一轮已把 cached system / AHB master 相关 directed tests 从手写机器码迁移到软件镜像流，相关 testbench 已由用户确认 VCS PASS。Stage A2 第二轮已迁移 cached timer / UART，并给回归脚本加入软件镜像构建和缺失检查；用户已确认 `mmio` suite VCS PASS。Stage A2 第三轮已迁移 timer IRQ、access fault、instruction access fault 和 misaligned trap 相关 cached directed tests，并已由用户确认 VCS PASS。Stage A2 第四轮已迁移 branch predict 和 RV32M pipeline directed tests，并已由用户确认 VCS PASS。Stage A2 第五轮已迁移 `rv32i_pipe_core_tb` 和 `rv32i_trap_csr_tb` 到软件镜像流，并已由用户确认 VCS PASS。Stage A2 第六轮已把剩余 CPU 程序型 directed tests 一次性迁移到软件镜像流，并已由用户确认 full regression PASS，日志目录为 `sim/log/regress/20260520_173852-full`。Stage A3 第一版项目内 ISA 基础测试子集已新增并接入 `isa/core/full` suite，用户已确认 `rv32i_pipe_isa_basic_tb` VCS PASS：`cycle=476`、`instret=184`、`stall_cycle=190`、`flush_cycle=49`、`branch_count=48`、`branch_mispredict_count=48`。Agent workload baseline v0.1 已由用户确认 VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`。Agent matrix accelerator v0.2a 已完成 APB scratchpad RTL、SoC 接线、软件镜像和 directed test，等待 VCS 确认后再把验证矩阵从 `PENDING` 改为 `PASS`。Stage A4 第一版质量检查入口已新增，PowerShell `basic` suite 已通过 filelist/SDC 检查，`all -DryRun` 已验证命令路径，Bash 脚本已通过语法检查；本机未安装 Verilator/Yosys/OpenSTA，真实 lint/synth/timing 运行当前为工具缺失导致的 `SKIP`。Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/architecture/RV32I_CPU_IP_DELIVERY.md` 并把 README、接口索引和 AHB 文档入口统一到 `rv32i_cached_ahb_master_top`。Linux 回归机暂未配置 `riscv-none-elf-gcc`，因此 `--build-software` 会停在工具链预检查；使用已生成 MEMH 的普通 `make sim` 路径已确认通过。
+当前 Phase 6 第一轮 `rv32i_pipe_core` 仿真期 assertion 已加入，并由用户确认 VCS 回归 PASS。Stage A1 自动化回归入口第一版已完成，`smoke/core/cache/soc/full` suite 均已由用户确认 VCS PASS。Stage A2 第一轮已把 cached system / AHB master 相关 directed tests 从手写机器码迁移到软件镜像流，相关 testbench 已由用户确认 VCS PASS。Stage A2 第二轮已迁移 cached timer / UART，并给回归脚本加入软件镜像构建和缺失检查；用户已确认 `mmio` suite VCS PASS。Stage A2 第三轮已迁移 timer IRQ、access fault、instruction access fault 和 misaligned trap 相关 cached directed tests，并已由用户确认 VCS PASS。Stage A2 第四轮已迁移 branch predict 和 RV32M pipeline directed tests，并已由用户确认 VCS PASS。Stage A2 第五轮已迁移 `rv32i_pipe_core_tb` 和 `rv32i_trap_csr_tb` 到软件镜像流，并已由用户确认 VCS PASS。Stage A2 第六轮已把剩余 CPU 程序型 directed tests 一次性迁移到软件镜像流，并已由用户确认 full regression PASS，日志目录为 `sim/log/regress/20260520_173852-full`。Stage A3 第一版项目内 ISA 基础测试子集已新增并接入 `isa/core/full` suite，用户已确认 `rv32i_pipe_isa_basic_tb` VCS PASS：`cycle=476`、`instret=184`、`stall_cycle=190`、`flush_cycle=49`、`branch_count=48`、`branch_mispredict_count=48`。Agent workload baseline v0.1 已由用户确认 VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`。Agent matrix accelerator v0.2a/v0.2b 已完成 APB scratchpad、SRAM-mode memory master、2-master AHB front-end、软件镜像和 directed tests，等待 VCS 确认后再把验证矩阵从 `PENDING` 改为 `PASS`。Stage A4 第一版质量检查入口已新增，PowerShell `basic` suite 已通过 filelist/SDC 检查，`all -DryRun` 已验证命令路径，Bash 脚本已通过语法检查；本机未安装 Verilator/Yosys/OpenSTA，真实 lint/synth/timing 运行当前为工具缺失导致的 `SKIP`。Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/architecture/RV32I_CPU_IP_DELIVERY.md` 并把 README、接口索引和 AHB 文档入口统一到 `rv32i_cached_ahb_master_top`。Linux 回归机暂未配置 `riscv-none-elf-gcc`，因此 `--build-software` 会停在工具链预检查；使用已生成 MEMH 的普通 `make sim` 路径已确认通过。
 
 ## 设计假设
 
@@ -261,8 +270,8 @@ Stage C：性能优化型 CPU core
 
 ## 下一步候选
 
-1. 在 VCS 环境运行 `rv32i_agent_matrix_accel_soc_tb`，确认 v0.2a APB scratchpad 加速器 PASS 并记录 cycle/instret。
-2. v0.2b：把 Agent Matrix Accelerator 从 APB scratchpad 扩展到 SRAM src/dst/shape/stride 配置路径。
+1. 在 VCS 环境运行 `rv32i_agent_matrix_accel_soc_tb` 和 `rv32i_agent_matrix_accel_sram_soc_tb`，确认 v0.2a/v0.2b PASS 并记录 cycle/instret。
+2. v0.3：开始 Tool-call Detector APB block，做 token pattern match + IRQ 输出。
 3. 建立 NPU / Agent Accelerator 的软件功能模型和测试向量，不直接跳到完整 32x32 NPU RTL。
 4. 扩展 agent workload baseline 的结果记录，按 workload 分段统计 cycle/branch/stall。
 5. 在 Linux/CI 或本机安装 Verilator/Yosys 后运行 `tools/quality` 的 `lint/synth/all` suite，形成第一版 warning baseline。

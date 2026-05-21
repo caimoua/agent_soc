@@ -127,7 +127,7 @@ RISC-V GNU 工具链安装说明见 `docs/tooling/RISCV_TOOLCHAIN.md`。
 - 已新增 Stage A3 第一版 RV32I/RV32M ISA 基础测试子集，说明见 `docs/verification/RV32I_ISA_TESTS.md`；已通过 VCS。
 - 已新增 Stage A4 第一版质量检查入口，支持 filelist/SDC 检查，并可选接入 Verilator lint、Yosys 综合和 OpenSTA 时序检查。说明见 `docs/verification/RV32I_QUALITY_CHECKS.md`。
 - 已新增玄铁式 Agent Core 路线分析、AI Agent MCU + NPU SoC 新路线承接和 Agent SoC v0 可执行架构，后续优先建立 agent workload baseline 和 NPU/Agent Accelerator 功能模型，再做 control-flow、custom ISA、matrix accelerator 和 SoC fabric 升级。
-- 已新增 Agent Matrix Accelerator v0.2a APB scratchpad 原型，挂在 `rv32i_ahb_matrix_apb_soc_top` 的 `0x4200_2000` APB window，软件镜像和 SoC directed test 已补齐，等待 VCS 确认。
+- 已新增 Agent Matrix Accelerator v0.2a/v0.2b 原型，挂在 `rv32i_ahb_matrix_apb_soc_top` 的 `0x4200_2000` APB window；v0.2a 走 APB scratchpad，v0.2b 通过第二 AHB master 读写 SRAM，软件镜像和 SoC directed tests 已补齐，等待 VCS 确认。
 - 已新增最小 MMIO timer 外设，并给 D-cache 增加默认 MMIO uncached bypass。说明见 `docs/architecture/RV32I_TIMER.md`。
 - 已把 `timer_irq` 接入 pipeline trap/CSR 框架，新增最小 `mstatus/mie/mip`，支持 machine timer interrupt 和 `mret` 返回。
 - 已把 I/D 侧 bus decode error 接入 pipeline trap/CSR，支持 instruction/load/store access fault，并新增 `rv32i_cached_access_fault_tb` 和 `rv32i_cached_instr_access_fault_tb`。
@@ -239,6 +239,7 @@ Agent workload / matrix accelerator：
 ```bash
 make sim TB_FILE=./testcases/rv32i_agent_workload_tb.sv TOP_NAME=rv32i_agent_workload_tb
 make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_soc_tb
+make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_sram_soc_tb
 ```
 
 trap/CSR：
@@ -293,4 +294,4 @@ make sim TB_FILE=./testcases/rv32i_cached_uart_tb.sv TOP_NAME=rv32i_cached_uart_
 
 ## 后续方向
 
-后续优先确认 Agent Matrix Accelerator v0.2a 的 VCS 数据，然后推进 v0.2b：从 APB scratchpad 扩展到 SRAM src/dst/shape/stride 配置路径。同时建立 NPU/Agent Accelerator 的软件功能模型和测试向量，并继续完善 Stage A4：固定 lint warning baseline、在 Linux/CI 中接入 Verilator/Yosys，补充真实综合/时序报告。
+后续优先确认 Agent Matrix Accelerator v0.2a/v0.2b 的 VCS 数据，然后推进 v0.3 Tool-call Detector：token pattern match + IRQ 输出。同时建立 NPU/Agent Accelerator 的软件功能模型和测试向量，并继续完善 Stage A4：固定 lint warning baseline、在 Linux/CI 中接入 Verilator/Yosys，补充真实综合/时序报告。

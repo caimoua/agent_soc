@@ -64,7 +64,7 @@ v0 预留新增 APB 外设：
 
 | 地址范围 | 用途 | 目标阶段 |
 | --- | --- | --- |
-| `0x4200_2000` | Agent Matrix Accelerator | v0.2a 已接入，VCS 待确认 |
+| `0x4200_2000` | Agent Matrix Accelerator | v0.2a/v0.2b 已接入，VCS 待确认 |
 | `0x4200_3000` | Tool-call Detector | v0.3 |
 | `0x4200_4000` | Agent perf / event counter window | v0.3+ |
 
@@ -227,7 +227,7 @@ Base：`0x4200_2000`
 | Offset | Name | 描述 |
 | --- | --- | --- |
 | `0x00` | `CTRL` | bit0 start, bit1 irq_en, bit2 clear |
-| `0x04` | `STATUS` | bit0 busy, bit1 done, bit2 irq_pending |
+| `0x04` | `STATUS` | bit0 busy, bit1 done, bit2 irq_pending, bit3 error |
 | `0x08` | `SRC_A` | v0.2b SRAM source A base |
 | `0x0c` | `SRC_B` | v0.2b SRAM source B base |
 | `0x10` | `DST` | v0.2b SRAM destination base |
@@ -242,15 +242,19 @@ Base：`0x4200_2000`
 | `0x140` | `SCRATCH_B` | v0.2a vector B scratchpad window |
 | `0x180` | `RESULT` | v0.2a int32 result window |
 
-### 6.4 当前 v0.2a 实现
+### 6.4 当前 v0.2 实现
 
-当前代码已经落地第一版 APB scratchpad 版本：
+当前代码已经落地 APB scratchpad 版本和 SRAM-mode 版本：
 
 ```text
 rtl/accel/rv32i_agent_matrix_accel.v
+rtl/bus/rv32i_ahb_lite_matrix_2m4s.v
 software/asm/agent_matrix_accel.S
 software/bin/agent_matrix_accel.memh
+software/asm/agent_matrix_accel_sram.S
+software/bin/agent_matrix_accel_sram.memh
 sim/testcases/rv32i_agent_matrix_accel_soc_tb.sv
+sim/testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv
 ```
 
 集成路径：
@@ -260,6 +264,8 @@ rv32i_ahb_matrix_apb_soc_top
   -> rv32i_ahb_to_apb
     -> rv32i_apb_periph_mux
       -> rv32i_agent_matrix_accel @ 0x4200_2000
+        -> rv32i_simple_to_ahb
+          -> rv32i_ahb_lite_matrix_2m4s M1
 ```
 
 第一版固定计算：
@@ -268,7 +274,7 @@ rv32i_ahb_matrix_apb_soc_top
 4x4 signed int8 matrix * 4x1 signed int8 vector -> 4x1 signed int32 result
 ```
 
-软件 smoke 程序会写入 4 行 matrix 和 1 个 vector，启动 accelerator，polling `STATUS.done`，检查 4 个结果和 checksum，然后测试 `IRQ_STATUS/IRQ_CLEAR`。验证矩阵中该 SoC test 当前为 `PENDING`，等 VCS PASS 后记录 cycle/instret 数据。
+软件 smoke 程序会写入 4 行 matrix 和 1 个 vector，启动 accelerator，polling `STATUS.done`，检查 4 个结果和 checksum，然后测试 `IRQ_STATUS/IRQ_CLEAR`。scratchpad test 只通过 APB window 搬数据；SRAM-mode test 由 CPU 写 SRAM input，再由 accelerator 作为第二 AHB master 读 SRAM、写 SRAM result。验证矩阵中这两个 SoC tests 当前为 `PENDING`，等 VCS PASS 后记录 cycle/instret 数据。
 
 ### 6.5 v0.2 验收标准
 

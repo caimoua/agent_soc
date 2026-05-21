@@ -60,6 +60,17 @@ module rv32i_ahb_matrix_soc_top #(
   input  wire        apb_periph_hreadyout,
   input  wire [1:0]  apb_periph_hresp,
 
+  input  wire [31:0] accel_haddr,
+  input  wire [2:0]  accel_hburst,
+  input  wire [3:0]  accel_hprot,
+  input  wire [2:0]  accel_hsize,
+  input  wire [1:0]  accel_htrans,
+  input  wire [31:0] accel_hwdata,
+  input  wire        accel_hwrite,
+  output wire [31:0] accel_hrdata,
+  output wire        accel_hready,
+  output wire [1:0]  accel_hresp,
+
   output wire [31:0] dbg_pc,
   output wire [31:0] dbg_cycle,
   output wire [31:0] dbg_instret,
@@ -83,7 +94,9 @@ module rv32i_ahb_matrix_soc_top #(
   output wire [31:0] dbg_bus_i_grant_count,
   output wire [31:0] dbg_bus_d_grant_count,
   output wire        dbg_cpu_bus_error,
-  output wire        dbg_matrix_decode_error
+  output wire        dbg_matrix_decode_error,
+  output wire [31:0] dbg_matrix_m0_grant_count,
+  output wire [31:0] dbg_matrix_m1_grant_count
 );
 
   wire [31:0] cpu_haddr;
@@ -140,19 +153,29 @@ module rv32i_ahb_matrix_soc_top #(
     .dbg_bus_error          (dbg_cpu_bus_error)
   );
 
-  rv32i_ahb_lite_matrix_1m4s u_matrix (
+  rv32i_ahb_lite_matrix_2m4s u_matrix (
     .clk              (clk),
     .rst_n            (rst_n),
-    .m_haddr          (cpu_haddr),
-    .m_hburst         (cpu_hburst),
-    .m_hprot          (cpu_hprot),
-    .m_hsize          (cpu_hsize),
-    .m_htrans         (cpu_htrans),
-    .m_hwdata         (cpu_hwdata),
-    .m_hwrite         (cpu_hwrite),
-    .m_hrdata         (cpu_hrdata),
-    .m_hready         (cpu_hready),
-    .m_hresp          (cpu_hresp),
+    .m0_haddr         (cpu_haddr),
+    .m0_hburst        (cpu_hburst),
+    .m0_hprot         (cpu_hprot),
+    .m0_hsize         (cpu_hsize),
+    .m0_htrans        (cpu_htrans),
+    .m0_hwdata        (cpu_hwdata),
+    .m0_hwrite        (cpu_hwrite),
+    .m0_hrdata        (cpu_hrdata),
+    .m0_hready        (cpu_hready),
+    .m0_hresp         (cpu_hresp),
+    .m1_haddr         (accel_haddr),
+    .m1_hburst        (accel_hburst),
+    .m1_hprot         (accel_hprot),
+    .m1_hsize         (accel_hsize),
+    .m1_htrans        (accel_htrans),
+    .m1_hwdata        (accel_hwdata),
+    .m1_hwrite        (accel_hwrite),
+    .m1_hrdata        (accel_hrdata),
+    .m1_hready        (accel_hready),
+    .m1_hresp         (accel_hresp),
     .s0_hsel          (flash_hsel),
     .s0_haddr         (flash_haddr),
     .s0_hburst        (flash_hburst),
@@ -201,7 +224,9 @@ module rv32i_ahb_matrix_soc_top #(
     .s3_hrdata        (apb_periph_hrdata),
     .s3_hreadyout     (apb_periph_hreadyout),
     .s3_hresp         (apb_periph_hresp),
-    .dbg_decode_error (dbg_matrix_decode_error)
+    .dbg_decode_error (dbg_matrix_decode_error),
+    .dbg_m0_grant_count(dbg_matrix_m0_grant_count),
+    .dbg_m1_grant_count(dbg_matrix_m1_grant_count)
   );
 
 endmodule

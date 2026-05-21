@@ -32,7 +32,7 @@
 
 - 推荐 CPU 交付边界是 `rv32i_cached_ahb_master_top`。
 - 当前 AHB-Lite master 是 single outstanding。
-- 当前 SoC fabric 仍是小型 AHB-Lite / APB 结构。
+- 当前 SoC fabric 仍是小型 AHB-Lite / APB 结构；已新增保守的 2-master 前端用于 accelerator SRAM-mode，但还不是完整 AXI4 / burst-capable fabric。
 - 当前没有 AXI4 crossbar。
 - 当前没有 DMA master。
 - 当前没有 QSPI/PSRAM/HyperRAM 控制器 RTL。
@@ -44,7 +44,7 @@
 - NPU systolic array。
 - NPU tensor sequencer / microcode SRAM。
 - NPU local buffer。
-- Agent Matrix Accelerator 目前只有 APB scratchpad v0.2a 原型，还没有 SRAM/DMA 数据路径，也不是完整 NPU。
+- Agent Matrix Accelerator 目前有 APB scratchpad v0.2a 和 SRAM-mode v0.2b 原型，但还不是完整 NPU，也没有 burst DMA、tiling sequencer 或大阵列。
 - Tool-call Detector。
 - Token Sampler。
 - KV-cache Manager。

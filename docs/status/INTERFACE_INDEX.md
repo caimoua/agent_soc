@@ -94,6 +94,8 @@ slot：
 - AHB peripheral：`0x4000_0000`
 - APB peripheral：`0x4200_0000`
 
+当前内部 fabric 已使用 `rv32i_ahb_lite_matrix_2m4s` 前端，保留 CPU 为 M0，并预留 accelerator/DMA 为 M1。M1 当前由 `rv32i_ahb_matrix_apb_soc_top` 中的 Agent Matrix Accelerator memory master 使用。
+
 ### `rv32i_ahb_matrix_apb_soc_top`
 
 文件：`rtl/top/rv32i_ahb_matrix_apb_soc_top.v`
@@ -110,6 +112,8 @@ APB 外设：
 
 - `timer_irq`：已接入 CPU machine timer interrupt，同时作为 top-level debug/output。
 - `agent_matrix_irq`：v0.2a 先作为 top-level output 暴露，尚未接入 CPU trap/interrupt 路径。
+- `dbg_matrix_m0_grant_count`：CPU master AHB grant count。
+- `dbg_matrix_m1_grant_count`：accelerator master AHB grant count。
 
 ## Core
 
@@ -401,6 +405,19 @@ commit exception inputs：
 
 用途：clean-room 1-master / 4-slave AHB-Lite matrix/decode。
 
+### `rv32i_ahb_lite_matrix_2m4s`
+
+文件：`rtl/bus/rv32i_ahb_lite_matrix_2m4s.v`
+
+用途：2-master / 4-slave AHB-Lite front-end。内部复用 `rv32i_ahb_lite_matrix_1m4s`，在前端对 M0 CPU 和 M1 accelerator 做非流水化仲裁。
+
+行为：
+
+- M1 accelerator 请求优先于 M0 CPU。
+- 每次只允许一个 master 的 single-beat transfer 进入内部 1m4s matrix。
+- 插入保守 bubble，不做跨 master address/data phase pipeline。
+- 输出 `dbg_m0_grant_count` 和 `dbg_m1_grant_count`。
+
 ## MMIO 外设
 
 ### `rv32i_timer`
@@ -431,13 +448,20 @@ base：`0x4000_1000` 或 APB SoC 中的 `0x4200_1000`。
 
 base：APB SoC 中的 `0x4200_2000`。
 
-用途：Agent SoC v0.2a 的最小 INT8 matvec 加速器。CPU 通过 APB scratchpad 写入固定 `4x4` signed int8 matrix 和 `4x1` signed int8 vector，写 `CTRL.start` 后模块生成 4 个 signed int32 result，CPU 通过 polling `STATUS.done` 读取结果。
+用途：Agent SoC v0.2 的最小 INT8 matvec 加速器。CPU 可通过 APB scratchpad 写入固定 `4x4` signed int8 matrix 和 `4x1` signed int8 vector，也可通过 SRAM-mode 寄存器配置 `SRC_A/SRC_B/DST/STRIDE`，由 accelerator memory master 自行读写 SRAM。写 `CTRL.start` 后模块生成 4 个 signed int32 result，CPU 通过 polling `STATUS.done` 读取结果。
 
 寄存器：
 
 - `0x000 CTRL`：bit0 `start`，bit1 `irq_en`，bit2 `clear`。
-- `0x004 STATUS`：bit0 `busy`，bit1 `done`，bit2 `irq_pending`。
+- `0x004 STATUS`：bit0 `busy`，bit1 `done`，bit2 `irq_pending`，bit3 `error`。
+- `0x008 SRC_A`：SRAM-mode matrix A base。
+- `0x00c SRC_B`：SRAM-mode vector B base。
+- `0x010 DST`：SRAM-mode result base。
 - `0x014 SHAPE`：固定返回 `M=4, N=1, K=4`。
+- `0x018 STRIDE_A`：SRAM-mode row stride。
+- `0x01c STRIDE_B`：SRAM-mode vector stride，当前预留。
+- `0x020 STRIDE_D`：SRAM-mode result stride。
+- `0x024 FLAGS`：bit0 `sram_mode`。
 - `0x028 IRQ_STATUS`：bit0 `irq_pending`。
 - `0x02c IRQ_CLEAR`：写 1 清 `irq_pending`。
 - `0x100` - `0x10c`：matrix A scratchpad，4 个 word，每 word 打包 4 个 int8。

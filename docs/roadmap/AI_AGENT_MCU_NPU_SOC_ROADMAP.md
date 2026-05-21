@@ -173,7 +173,7 @@ rv32i_agent_matrix_accel
   done/irq
 ```
 
-当前 v0.2a 已先落地 APB scratchpad 版本，地址为 `0x4200_2000`，固定计算 `4x4` signed int8 matrix 乘 `4x1` signed int8 vector，输出 4 个 signed int32 result。下一步 v0.2b 再补 SRAM src/dst/shape/stride 数据路径。
+当前 v0.2a/v0.2b 已落地，地址为 `0x4200_2000`，固定计算 `4x4` signed int8 matrix 乘 `4x1` signed int8 vector，输出 4 个 signed int32 result。v0.2a 支持 APB scratchpad，v0.2b 支持 SRAM `SRC_A/SRC_B/DST/STRIDE` 数据路径，并通过第二 AHB master 访问 SRAM。
 
 验收标准：
 

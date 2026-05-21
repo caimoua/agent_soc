@@ -38,6 +38,7 @@ rv32i_cached_ahb_master_top
   - Routes timer interrupt into the CPU subsystem.
 - `rtl/accel/rv32i_agent_matrix_accel.v`
   - APB scratchpad INT8 `4x4` matrix by `4x1` vector accelerator.
+  - SRAM-mode register path can read matrix/vector from SRAM and write result back through the accelerator AHB master.
   - Generates 4 signed int32 results and a done/IRQ-pending status.
 
 ## Memory Map
@@ -75,14 +76,19 @@ Agent Matrix Accelerator smoke image:
 ```text
 software/asm/agent_matrix_accel.S
 software/bin/agent_matrix_accel.memh
+software/asm/agent_matrix_accel_sram.S
+software/bin/agent_matrix_accel_sram.memh
 ```
 
 Run from `sim/`:
 
 ```bash
 make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_soc_tb
+make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_sram_soc_tb
 ```
 
 This test boots from flash, writes APB scratchpad matrix/vector data at `0x4200_2000`, starts the accelerator, polls done, checks four int32 results and IRQ pending/clear behavior, then stops on `ebreak`.
+
+The SRAM-mode test programs `SRC_A/SRC_B/DST/STRIDE/FLAGS`, then validates that the accelerator receives AHB M1 grants, reads SRAM input, and writes the result window back to SRAM.
 
 Status: pending VCS confirmation.

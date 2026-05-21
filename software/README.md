@@ -24,6 +24,7 @@ asm/ahb_matrix_soc.S
 ahb_matrix_soc
 ahb_matrix_apb_soc
 agent_matrix_accel
+agent_matrix_accel_sram
 cached_system_smoke
 cached_ahb_master
 cached_timer

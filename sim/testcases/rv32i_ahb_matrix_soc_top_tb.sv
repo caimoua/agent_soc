@@ -256,6 +256,16 @@ module rv32i_ahb_matrix_soc_top_tb;
     .apb_periph_hrdata      (apb_periph_hrdata),
     .apb_periph_hreadyout   (apb_periph_hreadyout),
     .apb_periph_hresp       (apb_periph_hresp),
+    .accel_haddr            (32'd0),
+    .accel_hburst           (3'd0),
+    .accel_hprot            (4'd0),
+    .accel_hsize            (3'd0),
+    .accel_htrans           (2'b00),
+    .accel_hwdata           (32'd0),
+    .accel_hwrite           (1'b0),
+    .accel_hrdata           (),
+    .accel_hready           (),
+    .accel_hresp            (),
     .dbg_pc                 (dbg_pc),
     .dbg_cycle              (dbg_cycle),
     .dbg_instret            (dbg_instret),
@@ -273,7 +283,9 @@ module rv32i_ahb_matrix_soc_top_tb;
     .dbg_bus_i_grant_count  (dbg_bus_i_grant_count),
     .dbg_bus_d_grant_count  (dbg_bus_d_grant_count),
     .dbg_cpu_bus_error      (dbg_cpu_bus_error),
-    .dbg_matrix_decode_error(dbg_matrix_decode_error)
+    .dbg_matrix_decode_error(dbg_matrix_decode_error),
+    .dbg_matrix_m0_grant_count(),
+    .dbg_matrix_m1_grant_count()
   );
 
   rv32i_ahb_to_simple u_flash_ahb_to_simple (
