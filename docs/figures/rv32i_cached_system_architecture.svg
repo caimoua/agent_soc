@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050" role="img" aria-labelledby="title desc">
+  <title id="title">RV32I Cached System Architecture</title>
+  <desc id="desc">Vector architecture diagram of the current RV32I cached system, pipeline core, caches, memory bus, MMIO timer/UART peripherals, timer interrupt, and I/D-side access fault paths.</desc>
+
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .title { font-family: Arial, Helvetica, sans-serif; font-size: 34px; font-weight: 700; fill: #172033; }
+      .subtitle { font-family: Arial, Helvetica, sans-serif; font-size: 16px; fill: #526071; }
+      .label { font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 700; fill: #172033; }
+      .small { font-family: Arial, Helvetica, sans-serif; font-size: 14px; fill: #344154; }
+      .tiny { font-family: Arial, Helvetica, sans-serif; font-size: 12px; fill: #526071; }
+      .box-title { font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: 700; fill: #172033; }
+      .box-text { font-family: Arial, Helvetica, sans-serif; font-size: 13px; fill: #344154; }
+      .boundary { fill: #f8fafc; stroke: #9aa7b5; stroke-width: 2; stroke-dasharray: 10 8; }
+      .core { fill: #eef5ff; stroke: #3168b7; stroke-width: 2.4; }
+      .stage { fill: #ffffff; stroke: #4f82c7; stroke-width: 1.7; }
+      .unit { fill: #f3f7fd; stroke: #7aa0d6; stroke-width: 1.5; }
+      .csr { fill: #f5efff; stroke: #8a5bc2; stroke-width: 1.8; }
+      .fault { fill: #fff1f1; stroke: #c94b4b; stroke-width: 1.8; }
+      .cache { fill: #effaf4; stroke: #3f8f5d; stroke-width: 2.2; }
+      .bus { fill: #f7f3ec; stroke: #9a6b2f; stroke-width: 2.2; }
+      .mem { fill: #fff8e6; stroke: #c08b20; stroke-width: 2; }
+      .timer { fill: #eef8f7; stroke: #2f8c89; stroke-width: 2; }
+      .legend { fill: #ffffff; stroke: #d6dde7; stroke-width: 1.4; }
+      .arrow { stroke: #344154; stroke-width: 2.1; fill: none; marker-end: url(#arrow); }
+      .arrow-light { stroke: #637184; stroke-width: 1.7; fill: none; marker-end: url(#arrow-light); }
+      .arrow-red { stroke: #bd3d3d; stroke-width: 2.1; fill: none; marker-end: url(#arrow-red); }
+      .arrow-purple { stroke: #7c4bb0; stroke-width: 2.1; fill: none; marker-end: url(#arrow-purple); }
+      .arrow-green { stroke: #2f8f58; stroke-width: 2.1; fill: none; marker-end: url(#arrow-green); }
+      .dash-red { stroke: #bd3d3d; stroke-width: 2.1; fill: none; stroke-dasharray: 7 6; marker-end: url(#arrow-red); }
+      .dash-purple { stroke: #7c4bb0; stroke-width: 2.1; fill: none; stroke-dasharray: 7 6; marker-end: url(#arrow-purple); }
+      .dash-teal { stroke: #2f8c89; stroke-width: 2.1; fill: none; stroke-dasharray: 7 6; marker-end: url(#arrow-teal); }
+    </style>
+
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9.5" refY="5.5" orient="auto">
+      <path d="M 0 0 L 11 5.5 L 0 11 z" fill="#344154"/>
+    </marker>
+    <marker id="arrow-light" markerWidth="10" markerHeight="10" refX="8.8" refY="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#637184"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="11" markerHeight="11" refX="9.5" refY="5.5" orient="auto">
+      <path d="M 0 0 L 11 5.5 L 0 11 z" fill="#bd3d3d"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="11" markerHeight="11" refX="9.5" refY="5.5" orient="auto">
+      <path d="M 0 0 L 11 5.5 L 0 11 z" fill="#7c4bb0"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="11" markerHeight="11" refX="9.5" refY="5.5" orient="auto">
+      <path d="M 0 0 L 11 5.5 L 0 11 z" fill="#2f8f58"/>
+    </marker>
+    <marker id="arrow-teal" markerWidth="11" markerHeight="11" refX="9.5" refY="5.5" orient="auto">
+      <path d="M 0 0 L 11 5.5 L 0 11 z" fill="#2f8c89"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="1050"/>
+
+  <text class="title" x="80" y="70">RV32I Cached System Architecture</text>
+  <text class="subtitle" x="82" y="100">Current implementation: five-stage pipeline, blocking I/D caches, simple memory bus, MMIO timer/UART, and access faults</text>
+
+  <rect class="boundary" x="55" y="130" width="1150" height="795" rx="16"/>
+  <text class="label" x="82" y="164">rv32i_cached_system_top</text>
+
+  <!-- Pipeline core -->
+  <rect class="core" x="90" y="205" width="565" height="610" rx="14"/>
+  <text class="label" x="120" y="242">rv32i_pipe_core</text>
+  <text class="tiny" x="121" y="264">precise commit, redirect flush, stale-fetch discard</text>
+
+  <!-- Pipeline stages -->
+  <rect class="stage" x="120" y="305" width="82" height="78" rx="8"/>
+  <text class="box-title" x="148" y="335">IF</text>
+  <text class="box-text" x="132" y="358">PC</text>
+  <text class="box-text" x="132" y="376">fetch</text>
+
+  <rect class="stage" x="220" y="305" width="82" height="78" rx="8"/>
+  <text class="box-title" x="247" y="335">ID</text>
+  <text class="box-text" x="231" y="358">decode</text>
+  <text class="box-text" x="231" y="376">regfile</text>
+
+  <rect class="stage" x="320" y="305" width="82" height="78" rx="8"/>
+  <text class="box-title" x="347" y="335">EX</text>
+  <text class="box-text" x="331" y="358">ALU</text>
+  <text class="box-text" x="331" y="376">branch</text>
+
+  <rect class="stage" x="420" y="305" width="82" height="78" rx="8"/>
+  <text class="box-title" x="447" y="335">MEM</text>
+  <text class="box-text" x="431" y="358">LSU</text>
+  <text class="box-text" x="431" y="376">dmem</text>
+
+  <rect class="stage" x="520" y="305" width="82" height="78" rx="8"/>
+  <text class="box-title" x="548" y="335">WB</text>
+  <text class="box-text" x="531" y="358">commit</text>
+  <text class="box-text" x="531" y="376">writeback</text>
+
+  <path class="arrow-light" d="M 202 344 L 218 344"/>
+  <path class="arrow-light" d="M 302 344 L 318 344"/>
+  <path class="arrow-light" d="M 402 344 L 418 344"/>
+  <path class="arrow-light" d="M 502 344 L 518 344"/>
+
+  <!-- Core helper units -->
+  <rect class="unit" x="120" y="435" width="190" height="95" rx="8"/>
+  <text class="box-title" x="142" y="464">rv32i_pipe_hazard</text>
+  <text class="box-text" x="142" y="489">forwarding</text>
+  <text class="box-text" x="142" y="509">load-use stall</text>
+
+  <rect class="fault" x="340" y="435" width="190" height="95" rx="8"/>
+  <text class="box-title" x="385" y="464">rv32i_pipe_lsu</text>
+  <text class="box-text" x="362" y="489">load/store align</text>
+  <text class="box-text" x="362" y="509">load/store fault</text>
+
+  <rect class="csr" x="220" y="595" width="310" height="130" rx="10"/>
+  <text class="box-title" x="302" y="626">rv32i_pipe_csr</text>
+  <text class="box-text" x="252" y="653">mtvec / mepc / mcause</text>
+  <text class="box-text" x="252" y="674">mstatus / mie / mip</text>
+  <text class="box-text" x="252" y="695">trap, timer IRQ, mret redirect</text>
+
+  <path class="arrow-light" d="M 215 435 C 230 405, 248 392, 261 383"/>
+  <path class="arrow-light" d="M 435 435 C 440 410, 450 394, 461 383"/>
+  <path class="arrow-purple" d="M 561 383 C 590 450, 590 570, 532 640"/>
+  <text class="tiny" x="570" y="492">commit trap</text>
+  <path class="dash-purple" d="M 220 660 C 145 645, 105 575, 130 385"/>
+  <text class="tiny" x="110" y="608">redirect pc</text>
+
+  <!-- Caches and bus -->
+  <rect class="cache" x="735" y="210" width="185" height="120" rx="12"/>
+  <text class="box-title" x="777" y="244">rv32i_icache</text>
+  <text class="box-text" x="761" y="272">2-way set assoc.</text>
+  <text class="box-text" x="761" y="292">4-word line</text>
+  <text class="box-text" x="761" y="312">cpu_error path</text>
+
+  <rect class="cache" x="735" y="430" width="185" height="145" rx="12"/>
+  <text class="box-title" x="775" y="464">rv32i_dcache</text>
+  <text class="box-text" x="760" y="492">write-through</text>
+  <text class="box-text" x="760" y="512">no-write-allocate</text>
+  <text class="box-text" x="760" y="532">MMIO uncached</text>
+  <text class="box-text" x="760" y="552">cpu_error path</text>
+
+  <rect class="bus" x="1010" y="315" width="155" height="185" rx="12"/>
+  <text class="box-title" x="1037" y="350">rv32i_mem_bus</text>
+  <text class="box-text" x="1032" y="380">D-priority arbiter</text>
+  <text class="box-text" x="1032" y="402">blocking grant</text>
+  <text class="box-text" x="1032" y="424">address decode</text>
+  <text class="box-text" x="1032" y="446">I/D error resp.</text>
+
+  <path class="arrow" d="M 655 270 L 733 270"/>
+  <text class="tiny" x="672" y="255">imem</text>
+  <path class="arrow" d="M 655 500 L 733 500"/>
+  <text class="tiny" x="672" y="486">dmem</text>
+  <path class="arrow" d="M 920 270 C 970 270, 990 325, 1008 365"/>
+  <text class="tiny" x="935" y="290">I master</text>
+  <path class="arrow" d="M 920 500 C 965 500, 985 450, 1008 425"/>
+  <text class="tiny" x="938" y="516">D master</text>
+  <path class="dash-red" d="M 735 552 C 670 620, 570 615, 530 500"/>
+  <text class="tiny" x="560" y="604">d_error to LSU</text>
+  <path class="dash-red" d="M 735 312 C 665 345, 590 330, 530 500"/>
+  <text class="tiny" x="580" y="338">i_error to IF token</text>
+
+  <!-- External slaves -->
+  <rect class="mem" x="1295" y="175" width="210" height="95" rx="10"/>
+  <text class="box-title" x="1370" y="210">ROM</text>
+  <text class="box-text" x="1342" y="236">0x0000_0000</text>
+
+  <rect class="mem" x="1295" y="315" width="210" height="95" rx="10"/>
+  <text class="box-title" x="1363" y="350">SRAM</text>
+  <text class="box-text" x="1342" y="376">0x2000_0000</text>
+
+  <rect class="mem" x="1295" y="455" width="210" height="95" rx="10"/>
+  <text class="box-title" x="1364" y="490">MMIO</text>
+  <text class="box-text" x="1342" y="516">0x4000_0000</text>
+  <text class="box-text" x="1342" y="536">peripheral mux</text>
+
+  <rect class="timer" x="1295" y="625" width="210" height="105" rx="10"/>
+  <text class="box-title" x="1356" y="660">rv32i_timer</text>
+  <text class="box-text" x="1344" y="687">mtime / mtimecmp</text>
+  <text class="box-text" x="1344" y="707">ctrl, timer_irq</text>
+
+  <rect class="timer" x="1295" y="765" width="210" height="95" rx="10"/>
+  <text class="box-title" x="1362" y="800">rv32i_uart</text>
+  <text class="box-text" x="1344" y="827">TXDATA / STATUS</text>
+  <text class="box-text" x="1344" y="847">tx_valid, tx_data</text>
+
+  <path class="arrow-green" d="M 1165 350 C 1218 315, 1235 232, 1293 222"/>
+  <text class="tiny" x="1195" y="278">ROM slave</text>
+  <path class="arrow-green" d="M 1165 390 L 1293 362"/>
+  <text class="tiny" x="1194" y="375">SRAM slave</text>
+  <path class="arrow-green" d="M 1165 435 C 1210 460, 1240 497, 1293 502"/>
+  <text class="tiny" x="1194" y="476">MMIO slave</text>
+  <path class="arrow-green" d="M 1385 550 C 1358 585, 1358 610, 1385 623"/>
+  <text class="tiny" x="1412" y="590">timer @ 0x4000_0000</text>
+  <path class="arrow-green" d="M 1450 550 C 1530 620, 1530 735, 1450 763"/>
+  <text class="tiny" x="1420" y="748">UART @ 0x4000_1000</text>
+  <path class="arrow-green" d="M 1505 812 L 1545 812"/>
+  <text class="tiny" x="1512" y="800">TX</text>
+
+  <path class="dash-teal" d="M 1295 682 C 1130 720, 860 770, 532 675"/>
+  <text class="tiny" x="927" y="744">timer_irq</text>
+
+  <!-- Trap summary panel -->
+  <rect class="legend" x="90" y="850" width="1075" height="55" rx="9"/>
+  <text class="small" x="120" y="884">Trap paths:</text>
+  <text class="tiny" x="215" y="884">ecall / ebreak / illegal -> mtvec</text>
+  <text class="tiny" x="470" y="884">timer_irq -> mcause 0x80000007</text>
+  <text class="tiny" x="730" y="884">D load fault -> mcause 5</text>
+  <text class="tiny" x="925" y="884">D store fault -> mcause 7</text>
+
+  <!-- Legend -->
+  <rect class="legend" x="1260" y="900" width="270" height="120" rx="10"/>
+  <text class="box-title" x="1284" y="930">Legend</text>
+  <line x1="1285" y1="957" x2="1335" y2="957" class="arrow"/>
+  <text class="tiny" x="1350" y="961">request / response</text>
+  <line x1="1285" y1="985" x2="1335" y2="985" class="dash-purple"/>
+  <text class="tiny" x="1350" y="989">redirect / control</text>
+  <line x1="1285" y1="1013" x2="1335" y2="1013" class="dash-red"/>
+  <text class="tiny" x="1350" y="1017">fault path</text>
+</svg>

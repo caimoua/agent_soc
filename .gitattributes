@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+*.v   text eol=lf
+*.sv  text eol=lf
+*.vh  text eol=lf
+*.f   text eol=lf
+Makefile text eol=lf
+*.tcl text eol=lf
+*.S   text eol=lf
+*.md  text eol=lf
+*.svg text eol=lf

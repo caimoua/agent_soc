@@ -1,0 +1,59 @@
+# Simulation output
+sim/csrc/
+sim/simv
+sim/simv.daidir/
+sim/ucli.key
+sim/*.log
+sim/*.vpd
+sim/*.vcd
+sim/*.fsdb
+sim/*.key
+sim/novas.*
+sim/verdiLog/
+sim/DVEfiles/
+
+# Common generated waveform/database files
+*.fsdb
+*.vcd
+*.vpd
+*.wlf
+*.trn
+*.dsn
+
+# EDA generated files
+project/log/
+*.jou
+*.pb
+*.rpt
+*.rptx
+*.str
+*.xpr
+*.runs/
+*.cache/
+*.hw/
+*.ip_user_files/
+
+# Build/cache
+build/
+out/
+dist/
+.cache/
+__pycache__/
+*.pyc
+
+# Software build products. Keep checked-in memory images explicit.
+software/bin/*.bin
+software/bin/*.elf
+software/bin/*.map
+software/bin/*.o
+!software/bin/*.memh
+
+# Local licensed third-party RTL/IP. Keep public commits clean.
+vendor_ip/*
+!vendor_ip/README.md
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
