@@ -107,11 +107,13 @@ APB 外设：
 - timer：`0x4200_0000`
 - UART：`0x4200_1000`
 - Agent Matrix Accelerator：`0x4200_2000`
+- Tool-call Detector：`0x4200_3000`
 
 新增中断/状态输出：
 
 - `timer_irq`：已接入 CPU machine timer interrupt，同时作为 top-level debug/output。
 - `agent_matrix_irq`：v0.2a 先作为 top-level output 暴露，尚未接入 CPU trap/interrupt 路径。
+- `tool_call_irq`：v0.3 先作为 top-level output 暴露，尚未接入 CPU trap/interrupt 路径。
 - `dbg_matrix_m0_grant_count`：CPU master AHB grant count。
 - `dbg_matrix_m1_grant_count`：accelerator master AHB grant count。
 
@@ -473,3 +475,30 @@ Debug 输出：
 - `dbg_status`
 - `dbg_result0` - `dbg_result3`
 - `dbg_start_count`
+
+### `rv32i_tool_call_detector`
+
+文件：`rtl/accel/rv32i_tool_call_detector.v`
+
+base：APB SoC 中的 `0x4200_3000`。
+
+用途：Agent SoC v0.3 的 token pattern detector。CPU 配置最多 8 个 16-bit token 的 pattern，然后逐个写入 `TOKEN_IN`。硬件维护 8-entry history，最近 `PATTERN_LEN` 个 token 匹配 pattern 时置位 match、累加 match_count，并产生 pending IRQ。
+
+寄存器：
+
+- `0x000 CTRL`：bit0 `enable`，bit1 `clear`，bit2 `irq_en`。
+- `0x004 STATUS`：bit0 `active`，bit1 `match`，bit2 `overflow`，bit3 `irq_pending`。
+- `0x008 PATTERN_LEN`：1 到 8 token。
+- `0x00c TOKEN_IN`：写入 16-bit token 并推进 matcher。
+- `0x010 MATCH_COUNT`：命中次数。
+- `0x014 TOKEN_COUNT`：已接收 token 数，最多饱和到 8。
+- `0x018 IRQ_STATUS`：bit0 `irq_pending`。
+- `0x01c IRQ_CLEAR`：写 1 清 `irq_pending`。
+- `0x020` - `0x02c PATTERN0..3`：每 word 打包两个 16-bit token。
+
+Debug 输出：
+
+- `dbg_status`
+- `dbg_match_count`
+- `dbg_token_count`
+- `dbg_last_token`

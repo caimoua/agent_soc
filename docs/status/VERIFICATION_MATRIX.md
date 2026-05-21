@@ -26,6 +26,7 @@
 | Agent workload baseline | `testcases/rv32i_agent_workload_tb.sv` | `make sim TB_FILE=./testcases/rv32i_agent_workload_tb.sv TOP_NAME=rv32i_agent_workload_tb` | PASS |
 | Agent matrix accelerator SoC | `testcases/rv32i_agent_matrix_accel_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_soc_tb` | PENDING |
 | Agent matrix accelerator SRAM mode | `testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_sram_soc_tb` | PENDING |
+| Tool-call detector SoC | `testcases/rv32i_tool_call_detector_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_tool_call_detector_soc_tb.sv TOP_NAME=rv32i_tool_call_detector_soc_tb` | PENDING |
 | Trap/CSR | `testcases/rv32i_trap_csr_tb.sv` | `make sim TB_FILE=./testcases/rv32i_trap_csr_tb.sv TOP_NAME=rv32i_trap_csr_tb` | PASS |
 | I-cache | `testcases/rv32i_icache_tb.sv` | `make sim TB_FILE=./testcases/rv32i_icache_tb.sv TOP_NAME=rv32i_icache_tb` | PASS |
 | D-cache | `testcases/rv32i_dcache_tb.sv` | `make sim TB_FILE=./testcases/rv32i_dcache_tb.sv TOP_NAME=rv32i_dcache_tb` | PASS |
@@ -91,6 +92,7 @@ RTL 接口或 core 控制流改动后，至少运行：
 - `rv32i_ahb_matrix_apb_soc_top_tb`
 - `rv32i_agent_matrix_accel_soc_tb`
 - `rv32i_agent_matrix_accel_sram_soc_tb`
+- `rv32i_tool_call_detector_soc_tb`
 - access fault 相关测试。
 
 CSR/trap 改动后，至少运行：
@@ -124,6 +126,7 @@ MMIO 改动后，至少运行：
 - 2026-05-21：用户确认 Agent workload baseline v0.1 `rv32i_agent_workload_tb` VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`、`btb_hit=25`、`btb_miss=22`、`bht_update=47`。该测试覆盖 agent event loop、tool dispatch、token scan、INT8 dot 和 tiny matvec，并已接入 `agent` regression suite。
 - 2026-05-21：新增 Agent matrix accelerator v0.2a SoC directed test：`rv32i_agent_matrix_accel_soc_tb`。该测试加载 `software/bin/agent_matrix_accel.memh`，通过 APB `0x4200_2000` scratchpad 启动 4x4 INT8 matvec，检查 4 个 int32 结果、checksum、IRQ pending/clear、debug status 和无 timer/UART 副作用；等待用户在 VCS 环境确认，当前状态 `PENDING`。
 - 2026-05-21：新增 Agent matrix accelerator v0.2b SRAM-mode directed test：`rv32i_agent_matrix_accel_sram_soc_tb`。该测试加载 `software/bin/agent_matrix_accel_sram.memh`，CPU 在 SRAM 写入 matrix/vector，accelerator 作为第二 AHB master 读取 SRAM 并写回 result window，testbench 检查结果、IRQ pending/clear 和 accelerator AHB grant count；等待用户在 VCS 环境确认，当前状态 `PENDING`。
+- 2026-05-21：新增 Tool-call Detector v0.3 SoC directed test：`rv32i_tool_call_detector_soc_tb`。该测试加载 `software/bin/tool_call_detector.memh`，配置 4-token pattern，写入 8-token stream，检查 match_count/token_count/status/IRQ clear 和无 matrix/UART 副作用；等待用户在 VCS 环境确认，当前状态 `PENDING`。
 - 2026-05-21：Stage A4 第一版质量检查入口已新增，包含 PowerShell/Bash 脚本、`rv32i_cached_ahb_master_top` 初始 SDC 和 `docs/verification/RV32I_QUALITY_CHECKS.md`。本机已通过 filelist/SDC 基础检查、`all -DryRun` 和 Bash 语法检查；Verilator/Yosys/OpenSTA 真实运行因本机缺工具标记为 `SKIP`。
 - 2026-05-21：用户确认 Stage A3 第一版 `rv32i_pipe_isa_basic_tb` VCS PASS：`cycle=476`、`instret=184`、`stall_cycle=190`、`flush_cycle=49`、`branch_count=48`、`branch_mispredict_count=48`。该测试覆盖 RV32I arithmetic/branch/jump/load-store 以及 RV32M mul/div/rem 基础和边界行为，并已接入 `isa/core/full` 回归 suite。
 - 2026-05-20：Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/architecture/RV32I_CPU_IP_DELIVERY.md`，并把 README、接口索引和 AHB 文档入口统一到推荐交付边界 `rv32i_cached_ahb_master_top`。本轮只改文档，不需要新增 VCS 测试。

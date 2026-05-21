@@ -50,6 +50,7 @@ module rv32i_ahb_matrix_apb_soc_top #(
   output wire [7:0]  uart_tx_data,
   output wire        timer_irq,
   output wire        agent_matrix_irq,
+  output wire        tool_call_irq,
 
   output wire [31:0] dbg_pc,
   output wire [31:0] dbg_cycle,
@@ -91,7 +92,11 @@ module rv32i_ahb_matrix_apb_soc_top #(
   output wire [31:0] dbg_agent_matrix_result1,
   output wire [31:0] dbg_agent_matrix_result2,
   output wire [31:0] dbg_agent_matrix_result3,
-  output wire [31:0] dbg_agent_matrix_start_count
+  output wire [31:0] dbg_agent_matrix_start_count,
+  output wire [31:0] dbg_tool_call_status,
+  output wire [31:0] dbg_tool_call_match_count,
+  output wire [31:0] dbg_tool_call_token_count,
+  output wire [31:0] dbg_tool_call_last_token
 );
 
   wire        apb_hsel;
@@ -141,6 +146,14 @@ module rv32i_ahb_matrix_apb_soc_top #(
   wire [3:0]  agent_matrix_wstrb;
   wire        agent_matrix_ready;
   wire [31:0] agent_matrix_rdata;
+
+  wire        tool_call_valid;
+  wire        tool_call_write;
+  wire [31:0] tool_call_addr;
+  wire [31:0] tool_call_wdata;
+  wire [3:0]  tool_call_wstrb;
+  wire        tool_call_ready;
+  wire [31:0] tool_call_rdata;
 
   wire        agent_matrix_mem_valid;
   wire        agent_matrix_mem_write;
@@ -338,6 +351,13 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .agent_matrix_wstrb(agent_matrix_wstrb),
     .agent_matrix_ready(agent_matrix_ready),
     .agent_matrix_rdata(agent_matrix_rdata),
+    .tool_call_valid(tool_call_valid),
+    .tool_call_write(tool_call_write),
+    .tool_call_addr (tool_call_addr),
+    .tool_call_wdata(tool_call_wdata),
+    .tool_call_wstrb(tool_call_wstrb),
+    .tool_call_ready(tool_call_ready),
+    .tool_call_rdata(tool_call_rdata),
     .dbg_decode_error (dbg_apb_decode_error)
   );
 
@@ -400,6 +420,23 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .dbg_result2     (dbg_agent_matrix_result2),
     .dbg_result3     (dbg_agent_matrix_result3),
     .dbg_start_count (dbg_agent_matrix_start_count)
+  );
+
+  rv32i_tool_call_detector u_tool_call_detector (
+    .clk             (clk),
+    .rst_n           (rst_n),
+    .valid           (tool_call_valid),
+    .write           (tool_call_write),
+    .addr            (tool_call_addr),
+    .wdata           (tool_call_wdata),
+    .wstrb           (tool_call_wstrb),
+    .ready           (tool_call_ready),
+    .rdata           (tool_call_rdata),
+    .irq             (tool_call_irq),
+    .dbg_status      (dbg_tool_call_status),
+    .dbg_match_count (dbg_tool_call_match_count),
+    .dbg_token_count (dbg_tool_call_token_count),
+    .dbg_last_token  (dbg_tool_call_last_token)
   );
 
 endmodule

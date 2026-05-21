@@ -65,7 +65,7 @@ v0 预留新增 APB 外设：
 | 地址范围 | 用途 | 目标阶段 |
 | --- | --- | --- |
 | `0x4200_2000` | Agent Matrix Accelerator | v0.2a/v0.2b 已接入，VCS 待确认 |
-| `0x4200_3000` | Tool-call Detector | v0.3 |
+| `0x4200_3000` | Tool-call Detector | v0.3 已接入，VCS 待确认 |
 | `0x4200_4000` | Agent perf / event counter window | v0.3+ |
 
 长期 SoC 目标中的 `0xE000_0000` NPU 控制空间和 `0xF000_0000` Agent Accelerator 控制空间暂时只保留在北极星路线里，v0 不急着切换到该地址图。

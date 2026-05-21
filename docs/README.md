@@ -31,6 +31,7 @@ CPU、cache、bus、SoC wrapper、trap/CSR 和外设设计说明：
 - `architecture/RV32I_CPU_IP_DELIVERY.md`
 - `architecture/RV32I_LIMITATIONS.md`
 - `architecture/AGENT_MATRIX_ACCEL.md`
+- `architecture/TOOL_CALL_DETECTOR.md`
 - `architecture/RV32I_PIPELINE_CORE.md`
 - `architecture/RV32I_BRANCH_PREDICT.md`
 - `architecture/RV32I_M_EXTENSION.md`

@@ -19,6 +19,7 @@ rv32i_cached_ahb_master_top
         -> rv32i_timer
         -> rv32i_uart
         -> rv32i_agent_matrix_accel
+        -> rv32i_tool_call_detector
 ```
 
 ## Modules
@@ -30,7 +31,7 @@ rv32i_cached_ahb_master_top
   - Converts AHB `HSIZE/HADDR` into APB `PSTRB`.
   - Converts APB `PSLVERR` into AHB `HRESP=ERROR`.
 - `rtl/periph/rv32i_apb_periph_mux.v`
-  - Decodes APB timer, UART, and Agent Matrix Accelerator windows.
+  - Decodes APB timer, UART, Agent Matrix Accelerator, and Tool-call Detector windows.
   - Unmatched APB accesses complete with `PSLVERR=1`.
 - `rtl/top/rv32i_ahb_matrix_apb_soc_top.v`
   - Keeps flash/SRAM/AHB-peripheral AHB slots external.
@@ -40,6 +41,9 @@ rv32i_cached_ahb_master_top
   - APB scratchpad INT8 `4x4` matrix by `4x1` vector accelerator.
   - SRAM-mode register path can read matrix/vector from SRAM and write result back through the accelerator AHB master.
   - Generates 4 signed int32 results and a done/IRQ-pending status.
+- `rtl/accel/rv32i_tool_call_detector.v`
+  - APB token pattern detector.
+  - Matches up to 8 packed 16-bit tokens and exposes match count/status/IRQ pending.
 
 ## Memory Map
 
@@ -50,6 +54,7 @@ rv32i_cached_ahb_master_top
 0x4200_0000 - 0x4200_0FFF  APB timer
 0x4200_1000 - 0x4200_1FFF  APB UART
 0x4200_2000 - 0x4200_2FFF  APB Agent Matrix Accelerator
+0x4200_3000 - 0x4200_3FFF  APB Tool-call Detector
 ```
 
 ## Directed Test

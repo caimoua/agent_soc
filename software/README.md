@@ -25,6 +25,7 @@ ahb_matrix_soc
 ahb_matrix_apb_soc
 agent_matrix_accel
 agent_matrix_accel_sram
+tool_call_detector
 cached_system_smoke
 cached_ahb_master
 cached_timer
