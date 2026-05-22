@@ -105,4 +105,22 @@ cd sim
 make sim TB_FILE=./testcases/rv32i_agent_event_counter_soc_tb.sv TOP_NAME=rv32i_agent_event_counter_soc_tb
 ```
 
-当前状态：`PENDING`，等待 VCS 环境确认。
+当前状态：`PASS`，用户已通过 `agent` regression 确认，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_102533-agent`。
+
+首次结果：
+
+```text
+cycle=1335
+instret=129
+stall_cycle=1185
+flush_cycle=20
+tool_token=8
+tool_match=1
+tool_irq=1
+matrix_start=1
+matrix_done=1
+agent_irq=2
+last_irq_source=0x0000000c
+latency_last=113
+status=0x000000c2
+```

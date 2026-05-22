@@ -69,7 +69,7 @@ v0 预留新增 APB 外设：
 | --- | --- | --- |
 | `0x4200_2000` | Agent Matrix Accelerator | v0.2a/v0.2b 已接入并由 VCS 确认 |
 | `0x4200_3000` | Tool-call Detector | v0.3 已接入并由 VCS 确认 |
-| `0x4200_4000` | Agent Event Counter | v0.5 已接入，等待 VCS 确认 |
+| `0x4200_4000` | Agent Event Counter | v0.5 已接入并由 VCS 确认 |
 
 长期 SoC 目标中的 `0xE000_0000` NPU 控制空间和 `0xF000_0000` Agent Accelerator 控制空间暂时只保留在北极星路线里，v0 不急着切换到该地址图。
 
@@ -413,7 +413,7 @@ APB window：
 - Last IRQ source。
 - Tool match 到 IRQ clear 的 latency last/min/max/count。
 
-当前状态：directed test 已接入 `agent` suite，等待 VCS 确认。
+当前状态：directed test 已接入 `agent` suite，并已由用户通过 VCS 确认 PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_102533-agent`。
 
 ## 10. 结构整理方向
 
