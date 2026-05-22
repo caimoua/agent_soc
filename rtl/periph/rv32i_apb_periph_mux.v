@@ -37,29 +37,13 @@ module rv32i_apb_periph_mux #(
   input  wire        uart_ready,
   input  wire [31:0] uart_rdata,
 
-  output wire        agent_matrix_valid,
-  output wire        agent_matrix_write,
-  output wire [31:0] agent_matrix_addr,
-  output wire [31:0] agent_matrix_wdata,
-  output wire [3:0]  agent_matrix_wstrb,
-  input  wire        agent_matrix_ready,
-  input  wire [31:0] agent_matrix_rdata,
-
-  output wire        tool_call_valid,
-  output wire        tool_call_write,
-  output wire [31:0] tool_call_addr,
-  output wire [31:0] tool_call_wdata,
-  output wire [3:0]  tool_call_wstrb,
-  input  wire        tool_call_ready,
-  input  wire [31:0] tool_call_rdata,
-
-  output wire        agent_event_valid,
-  output wire        agent_event_write,
-  output wire [31:0] agent_event_addr,
-  output wire [31:0] agent_event_wdata,
-  output wire [3:0]  agent_event_wstrb,
-  input  wire        agent_event_ready,
-  input  wire [31:0] agent_event_rdata,
+  output wire        agent_valid,
+  output wire        agent_write,
+  output wire [31:0] agent_addr,
+  output wire [31:0] agent_wdata,
+  output wire [3:0]  agent_wstrb,
+  input  wire        agent_ready,
+  input  wire [31:0] agent_rdata,
 
   output wire        dbg_decode_error
 );
@@ -70,6 +54,7 @@ module rv32i_apb_periph_mux #(
   wire agent_matrix_sel;
   wire tool_call_sel;
   wire agent_event_sel;
+  wire agent_sel;
 
   assign apb_access       = psel && penable;
   assign timer_sel        = ((paddr & TIMER_MASK) == TIMER_BASE);
@@ -77,6 +62,7 @@ module rv32i_apb_periph_mux #(
   assign agent_matrix_sel = ((paddr & AGENT_MATRIX_MASK) == AGENT_MATRIX_BASE);
   assign tool_call_sel    = ((paddr & TOOL_CALL_MASK) == TOOL_CALL_BASE);
   assign agent_event_sel  = ((paddr & AGENT_EVENT_MASK) == AGENT_EVENT_BASE);
+  assign agent_sel        = agent_matrix_sel || tool_call_sel || agent_event_sel;
 
   assign timer_valid = apb_access && timer_sel;
   assign timer_write = pwrite;
@@ -90,40 +76,22 @@ module rv32i_apb_periph_mux #(
   assign uart_wdata = pwdata;
   assign uart_wstrb = pstrb;
 
-  assign agent_matrix_valid = apb_access && agent_matrix_sel;
-  assign agent_matrix_write = pwrite;
-  assign agent_matrix_addr  = paddr;
-  assign agent_matrix_wdata = pwdata;
-  assign agent_matrix_wstrb = pstrb;
-
-  assign tool_call_valid = apb_access && tool_call_sel;
-  assign tool_call_write = pwrite;
-  assign tool_call_addr  = paddr;
-  assign tool_call_wdata = pwdata;
-  assign tool_call_wstrb = pstrb;
-
-  assign agent_event_valid = apb_access && agent_event_sel;
-  assign agent_event_write = pwrite;
-  assign agent_event_addr  = paddr;
-  assign agent_event_wdata = pwdata;
-  assign agent_event_wstrb = pstrb;
+  assign agent_valid = apb_access && agent_sel;
+  assign agent_write = pwrite;
+  assign agent_addr  = paddr;
+  assign agent_wdata = pwdata;
+  assign agent_wstrb = pstrb;
 
   assign pready = !apb_access ? 1'b1 :
                   timer_sel   ? timer_ready :
                   uart_sel    ? uart_ready  :
-                  agent_matrix_sel ? agent_matrix_ready :
-                  tool_call_sel    ? tool_call_ready :
-                  agent_event_sel  ? agent_event_ready :
+                  agent_sel   ? agent_ready :
                                 1'b1;
   assign prdata = timer_sel ? timer_rdata :
                   uart_sel  ? uart_rdata  :
-                  agent_matrix_sel ? agent_matrix_rdata :
-                  tool_call_sel    ? tool_call_rdata :
-                  agent_event_sel  ? agent_event_rdata :
+                  agent_sel  ? agent_rdata :
                               32'd0;
-  assign pslverr = apb_access && !timer_sel && !uart_sel &&
-                   !agent_matrix_sel && !tool_call_sel &&
-                   !agent_event_sel;
+  assign pslverr = apb_access && !timer_sel && !uart_sel && !agent_sel;
 
   assign dbg_decode_error = pslverr;
 

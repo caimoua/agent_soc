@@ -18,9 +18,11 @@ rv32i_cached_ahb_master_top
       -> rv32i_apb_periph_mux
         -> rv32i_timer
         -> rv32i_uart
-        -> rv32i_agent_matrix_accel
-        -> rv32i_tool_call_detector
-        -> rv32i_agent_event_counter
+        -> rv32i_agent_periph_cluster
+          -> rv32i_agent_matrix_accel
+          -> rv32i_tool_call_detector
+          -> rv32i_agent_irq_aggregator
+          -> rv32i_agent_event_counter
 ```
 
 ## Modules
@@ -32,12 +34,17 @@ rv32i_cached_ahb_master_top
   - Converts AHB `HSIZE/HADDR` into APB `PSTRB`.
   - Converts APB `PSLVERR` into AHB `HRESP=ERROR`.
 - `rtl/periph/rv32i_apb_periph_mux.v`
-  - Decodes APB timer, UART, Agent Matrix Accelerator, Tool-call Detector, and Agent Event Counter windows.
+  - Decodes APB timer, UART, and the Agent peripheral windows.
+  - Routes `0x4200_2000`, `0x4200_3000`, and `0x4200_4000` through one `agent_*` access port.
   - Unmatched APB accesses complete with `PSLVERR=1`.
 - `rtl/top/rv32i_ahb_matrix_apb_soc_top.v`
   - Keeps flash/SRAM/AHB-peripheral AHB slots external.
-  - Instantiates internal APB timer, UART, Agent Matrix Accelerator, Tool-call Detector, IRQ aggregator, and Agent Event Counter.
+  - Instantiates internal APB timer, UART, and Agent peripheral cluster.
   - Routes the aggregated Agent/timer IRQ into the CPU subsystem through the current MTIP path.
+- `rtl/agent/rv32i_agent_periph_cluster.v`
+  - Local Agent APB decode and structural boundary for Agent peripherals.
+  - Internally instantiates Agent Matrix Accelerator, Tool-call Detector, IRQ aggregator, and Agent Event Counter.
+  - Keeps tool/matrix event pulses inside the cluster and preserves existing debug outputs.
 - `rtl/accel/rv32i_agent_matrix_accel.v`
   - APB scratchpad INT8 `4x4` matrix by `4x1` vector accelerator.
   - SRAM-mode register path can read matrix/vector from SRAM and write result back through the accelerator AHB master.
@@ -118,4 +125,4 @@ make sim TB_FILE=./testcases/rv32i_agent_event_counter_soc_tb.sv TOP_NAME=rv32i_
 
 This test boots from flash, runs one matrix accelerator transaction and one tool-call detector match, then reads the `0x4200_4000` event counter window to check token/match/IRQ, matrix start/done, last IRQ source, and match-to-clear latency counters.
 
-Status: pending VCS confirmation.
+Status: user-confirmed VCS PASS on 2026-05-22 before v0.6 structural cluster refactor. Re-run the `agent` regression after the cluster refactor before marking v0.6 PASS.

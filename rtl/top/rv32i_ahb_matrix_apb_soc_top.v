@@ -133,6 +133,8 @@ module rv32i_ahb_matrix_apb_soc_top #(
   wire [31:0] prdata;
   wire        pready;
   wire        pslverr;
+  wire        apb_mux_decode_error;
+  wire        agent_decode_error;
 
   wire        timer_valid;
   wire        timer_write;
@@ -150,29 +152,13 @@ module rv32i_ahb_matrix_apb_soc_top #(
   wire        uart_ready;
   wire [31:0] uart_rdata;
 
-  wire        agent_matrix_valid;
-  wire        agent_matrix_write;
-  wire [31:0] agent_matrix_addr;
-  wire [31:0] agent_matrix_wdata;
-  wire [3:0]  agent_matrix_wstrb;
-  wire        agent_matrix_ready;
-  wire [31:0] agent_matrix_rdata;
-
-  wire        tool_call_valid;
-  wire        tool_call_write;
-  wire [31:0] tool_call_addr;
-  wire [31:0] tool_call_wdata;
-  wire [3:0]  tool_call_wstrb;
-  wire        tool_call_ready;
-  wire [31:0] tool_call_rdata;
-
-  wire        agent_event_valid;
-  wire        agent_event_write;
-  wire [31:0] agent_event_addr;
-  wire [31:0] agent_event_wdata;
-  wire [3:0]  agent_event_wstrb;
-  wire        agent_event_ready;
-  wire [31:0] agent_event_rdata;
+  wire        agent_valid;
+  wire        agent_write;
+  wire [31:0] agent_addr;
+  wire [31:0] agent_wdata;
+  wire [3:0]  agent_wstrb;
+  wire        agent_ready;
+  wire [31:0] agent_rdata;
 
   wire        agent_matrix_mem_valid;
   wire        agent_matrix_mem_write;
@@ -193,11 +179,8 @@ module rv32i_ahb_matrix_apb_soc_top #(
   wire [31:0] accel_hrdata;
   wire        accel_hready;
   wire [1:0]  accel_hresp;
-  wire        tool_event_token;
-  wire        tool_event_match;
-  wire        tool_event_irq_clear;
-  wire        matrix_event_start;
-  wire        matrix_event_done;
+
+  assign dbg_apb_decode_error = apb_mux_decode_error | agent_decode_error;
 
   rv32i_ahb_matrix_soc_top #(
     .ICACHE_INDEX_BITS(ICACHE_INDEX_BITS),
@@ -368,28 +351,14 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .uart_wstrb       (uart_wstrb),
     .uart_ready       (uart_ready),
     .uart_rdata       (uart_rdata),
-    .agent_matrix_valid(agent_matrix_valid),
-    .agent_matrix_write(agent_matrix_write),
-    .agent_matrix_addr (agent_matrix_addr),
-    .agent_matrix_wdata(agent_matrix_wdata),
-    .agent_matrix_wstrb(agent_matrix_wstrb),
-    .agent_matrix_ready(agent_matrix_ready),
-    .agent_matrix_rdata(agent_matrix_rdata),
-    .tool_call_valid(tool_call_valid),
-    .tool_call_write(tool_call_write),
-    .tool_call_addr (tool_call_addr),
-    .tool_call_wdata(tool_call_wdata),
-    .tool_call_wstrb(tool_call_wstrb),
-    .tool_call_ready(tool_call_ready),
-    .tool_call_rdata(tool_call_rdata),
-    .agent_event_valid(agent_event_valid),
-    .agent_event_write(agent_event_write),
-    .agent_event_addr (agent_event_addr),
-    .agent_event_wdata(agent_event_wdata),
-    .agent_event_wstrb(agent_event_wstrb),
-    .agent_event_ready(agent_event_ready),
-    .agent_event_rdata(agent_event_rdata),
-    .dbg_decode_error (dbg_apb_decode_error)
+    .agent_valid     (agent_valid),
+    .agent_write     (agent_write),
+    .agent_addr      (agent_addr),
+    .agent_wdata     (agent_wdata),
+    .agent_wstrb     (agent_wstrb),
+    .agent_ready     (agent_ready),
+    .agent_rdata     (agent_rdata),
+    .dbg_decode_error(apb_mux_decode_error)
   );
 
   rv32i_timer u_timer (
@@ -410,42 +379,49 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .dbg_ctrl         (dbg_timer_ctrl)
   );
 
-  rv32i_agent_irq_aggregator u_agent_irq_aggregator (
-    .timer_irq        (timer_irq),
-    .agent_matrix_irq (agent_matrix_irq),
-    .tool_call_irq    (tool_call_irq),
-    .cpu_timer_irq    (cpu_timer_irq),
-    .dbg_status       (dbg_agent_irq_status)
-  );
-
-  rv32i_agent_event_counter u_agent_event_counter (
-    .clk                         (clk),
-    .rst_n                       (rst_n),
-    .valid                       (agent_event_valid),
-    .write                       (agent_event_write),
-    .addr                        (agent_event_addr),
-    .wdata                       (agent_event_wdata),
-    .wstrb                       (agent_event_wstrb),
-    .ready                       (agent_event_ready),
-    .rdata                       (agent_event_rdata),
-    .tool_token_event            (tool_event_token),
-    .tool_match_event            (tool_event_match),
-    .tool_irq_clear_event        (tool_event_irq_clear),
-    .matrix_start_event          (matrix_event_start),
-    .matrix_done_event           (matrix_event_done),
-    .timer_irq                   (timer_irq),
-    .agent_matrix_irq            (agent_matrix_irq),
-    .tool_call_irq               (tool_call_irq),
-    .cpu_timer_irq               (cpu_timer_irq),
-    .dbg_status                  (dbg_agent_event_status),
-    .dbg_tool_token_count        (dbg_agent_event_tool_token_count),
-    .dbg_tool_match_count        (dbg_agent_event_tool_match_count),
-    .dbg_tool_irq_count          (dbg_agent_event_tool_irq_count),
-    .dbg_matrix_start_count      (dbg_agent_event_matrix_start_count),
-    .dbg_matrix_done_count       (dbg_agent_event_matrix_done_count),
-    .dbg_agent_irq_count         (dbg_agent_event_agent_irq_count),
-    .dbg_last_irq_source         (dbg_agent_event_last_irq_source),
-    .dbg_latency_last            (dbg_agent_event_latency_last)
+  rv32i_agent_periph_cluster u_agent_periph_cluster (
+    .clk                                    (clk),
+    .rst_n                                  (rst_n),
+    .valid                                  (agent_valid),
+    .write                                  (agent_write),
+    .addr                                   (agent_addr),
+    .wdata                                  (agent_wdata),
+    .wstrb                                  (agent_wstrb),
+    .ready                                  (agent_ready),
+    .rdata                                  (agent_rdata),
+    .decode_error                           (agent_decode_error),
+    .matrix_mem_valid                       (agent_matrix_mem_valid),
+    .matrix_mem_write                       (agent_matrix_mem_write),
+    .matrix_mem_addr                        (agent_matrix_mem_addr),
+    .matrix_mem_wdata                       (agent_matrix_mem_wdata),
+    .matrix_mem_wstrb                       (agent_matrix_mem_wstrb),
+    .matrix_mem_ready                       (agent_matrix_mem_ready),
+    .matrix_mem_rdata                       (agent_matrix_mem_rdata),
+    .matrix_mem_error                       (agent_matrix_mem_error),
+    .timer_irq                              (timer_irq),
+    .agent_matrix_irq                       (agent_matrix_irq),
+    .tool_call_irq                          (tool_call_irq),
+    .cpu_timer_irq                          (cpu_timer_irq),
+    .dbg_agent_irq_status                   (dbg_agent_irq_status),
+    .dbg_agent_matrix_status                (dbg_agent_matrix_status),
+    .dbg_agent_matrix_result0               (dbg_agent_matrix_result0),
+    .dbg_agent_matrix_result1               (dbg_agent_matrix_result1),
+    .dbg_agent_matrix_result2               (dbg_agent_matrix_result2),
+    .dbg_agent_matrix_result3               (dbg_agent_matrix_result3),
+    .dbg_agent_matrix_start_count           (dbg_agent_matrix_start_count),
+    .dbg_tool_call_status                   (dbg_tool_call_status),
+    .dbg_tool_call_match_count              (dbg_tool_call_match_count),
+    .dbg_tool_call_token_count              (dbg_tool_call_token_count),
+    .dbg_tool_call_last_token               (dbg_tool_call_last_token),
+    .dbg_agent_event_status                 (dbg_agent_event_status),
+    .dbg_agent_event_tool_token_count       (dbg_agent_event_tool_token_count),
+    .dbg_agent_event_tool_match_count       (dbg_agent_event_tool_match_count),
+    .dbg_agent_event_tool_irq_count         (dbg_agent_event_tool_irq_count),
+    .dbg_agent_event_matrix_start_count     (dbg_agent_event_matrix_start_count),
+    .dbg_agent_event_matrix_done_count      (dbg_agent_event_matrix_done_count),
+    .dbg_agent_event_agent_irq_count        (dbg_agent_event_agent_irq_count),
+    .dbg_agent_event_last_irq_source        (dbg_agent_event_last_irq_source),
+    .dbg_agent_event_latency_last           (dbg_agent_event_latency_last)
   );
 
   rv32i_uart u_uart (
@@ -462,55 +438,6 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .tx_data      (uart_tx_data),
     .dbg_tx_count (dbg_uart_tx_count),
     .dbg_last_tx  (dbg_uart_last_tx)
-  );
-
-  rv32i_agent_matrix_accel u_agent_matrix_accel (
-    .clk             (clk),
-    .rst_n           (rst_n),
-    .valid           (agent_matrix_valid),
-    .write           (agent_matrix_write),
-    .addr            (agent_matrix_addr),
-    .wdata           (agent_matrix_wdata),
-    .wstrb           (agent_matrix_wstrb),
-    .ready           (agent_matrix_ready),
-    .rdata           (agent_matrix_rdata),
-    .mem_valid       (agent_matrix_mem_valid),
-    .mem_write       (agent_matrix_mem_write),
-    .mem_addr        (agent_matrix_mem_addr),
-    .mem_wdata       (agent_matrix_mem_wdata),
-    .mem_wstrb       (agent_matrix_mem_wstrb),
-    .mem_ready       (agent_matrix_mem_ready),
-    .mem_rdata       (agent_matrix_mem_rdata),
-    .mem_error       (agent_matrix_mem_error),
-    .irq             (agent_matrix_irq),
-    .dbg_status      (dbg_agent_matrix_status),
-    .dbg_result0     (dbg_agent_matrix_result0),
-    .dbg_result1     (dbg_agent_matrix_result1),
-    .dbg_result2     (dbg_agent_matrix_result2),
-    .dbg_result3     (dbg_agent_matrix_result3),
-    .dbg_start_count (dbg_agent_matrix_start_count),
-    .event_start     (matrix_event_start),
-    .event_done      (matrix_event_done)
-  );
-
-  rv32i_tool_call_detector u_tool_call_detector (
-    .clk             (clk),
-    .rst_n           (rst_n),
-    .valid           (tool_call_valid),
-    .write           (tool_call_write),
-    .addr            (tool_call_addr),
-    .wdata           (tool_call_wdata),
-    .wstrb           (tool_call_wstrb),
-    .ready           (tool_call_ready),
-    .rdata           (tool_call_rdata),
-    .irq             (tool_call_irq),
-    .dbg_status      (dbg_tool_call_status),
-    .dbg_match_count (dbg_tool_call_match_count),
-    .dbg_token_count (dbg_tool_call_token_count),
-    .dbg_last_token  (dbg_tool_call_last_token),
-    .event_token     (tool_event_token),
-    .event_match     (tool_event_match),
-    .event_irq_clear (tool_event_irq_clear)
   );
 
 endmodule

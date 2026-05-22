@@ -6,7 +6,7 @@
 
 ## Status
 
-项目状态、接口索引和验证矩阵：
+项目状态、接口索引、验证矩阵和目录地图：
 
 - `status/PROJECT_STATUS.md`
 - `status/INTERFACE_INDEX.md`
@@ -26,10 +26,11 @@
 
 ## Architecture
 
-CPU、cache、bus、SoC wrapper、trap/CSR 和外设设计说明：
+CPU、cache、bus、SoC wrapper、trap/CSR、外设和 Agent 原型设计说明：
 
 - `architecture/RV32I_CPU_IP_DELIVERY.md`
 - `architecture/RV32I_LIMITATIONS.md`
+- `architecture/AGENT_PERIPH_CLUSTER.md`
 - `architecture/AGENT_MATRIX_ACCEL.md`
 - `architecture/TOOL_CALL_DETECTOR.md`
 - `architecture/AGENT_IRQ_AGGREGATOR.md`

@@ -100,7 +100,7 @@ slot：
 
 文件：`rtl/top/rv32i_ahb_matrix_apb_soc_top.v`
 
-用途：在 AHB matrix SoC 的 APB slot 后面接 AHB-to-APB bridge、APB mux、timer、UART 和 Agent Matrix Accelerator。
+用途：在 AHB matrix SoC 的 APB slot 后面接 AHB-to-APB bridge、APB mux、timer、UART 和 Agent peripheral cluster。v0.6 起，该 top 不再直接实例化 matrix/tool/event counter 叶子模块，而是把 Agent 相关逻辑交给 `rv32i_agent_periph_cluster`。
 
 APB 外设：
 
@@ -121,6 +121,33 @@ APB 外设：
 - `dbg_agent_event_*`：v0.5 Agent Event Counter debug counters，覆盖 tool token/match/IRQ、matrix start/done、agent IRQ source 和 match-to-clear latency。
 - `dbg_matrix_m0_grant_count`：CPU master AHB grant count。
 - `dbg_matrix_m1_grant_count`：accelerator master AHB grant count。
+
+### `rv32i_agent_periph_cluster`
+
+文件：`rtl/agent/rv32i_agent_periph_cluster.v`
+
+用途：Agent SoC v0.6 的第一层结构化边界。它把 v0.2-v0.5 已经通过验证的 Agent Matrix Accelerator、Tool-call Detector、Agent IRQ Aggregator 和 Agent Event Counter 收束为一个 Agent 外设簇，减少 SoC top 中的 demo 线网。
+
+上游 simple/APB-like 访问口：
+
+- `valid`, `write`, `addr`, `wdata`, `wstrb`
+- `ready`, `rdata`
+- `decode_error`
+
+内部 APB 子窗口：
+
+- Agent Matrix Accelerator：`0x4200_2000`
+- Tool-call Detector：`0x4200_3000`
+- Agent Event Counter：`0x4200_4000`
+
+外部连接：
+
+- Matrix SRAM-mode memory master：`matrix_mem_valid/write/addr/wdata/wstrb/ready/rdata/error`
+- Raw timer IRQ input：`timer_irq`
+- Agent IRQ outputs：`agent_matrix_irq`, `tool_call_irq`, `cpu_timer_irq`
+- Debug outputs：继续透出 matrix、tool-call、agent IRQ status 和 agent event counters，保持现有 testbench 可观测面。
+
+说明文档：`docs/architecture/AGENT_PERIPH_CLUSTER.md`。
 
 ## Core
 

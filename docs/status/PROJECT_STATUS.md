@@ -168,6 +168,13 @@ Stage C：性能优化型 CPU core
   - `sim/regress/regression_list.txt` 已把该 test 接入 `agent` suite。
   - 用户已通过 `agent` regression 确认 VCS PASS，日志目录：`/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_102533-agent`。
   - 首次性能记录：`cycle=1335`、`instret=129`、`stall_cycle=1185`、`flush_cycle=20`、`tool_token=8`、`tool_match=1`、`tool_irq=1`、`matrix_start=1`、`matrix_done=1`、`agent_irq=2`、`last_irq_source=0x0000000c`、`latency_last=113`、`status=0x000000c2`。
+- Agent peripheral cluster v0.6 结构整理：
+  - `rtl/agent/rv32i_agent_periph_cluster.v`
+  - `filelist/cpu_filelist/agent_rtl.f`
+  - `rv32i_apb_periph_mux` 已把 `0x4200_2000`、`0x4200_3000` 和 `0x4200_4000` 三个 Agent 子窗口收束为一组 `agent_*` 访问口。
+  - `rv32i_ahb_matrix_apb_soc_top` 已改为实例化 Agent cluster，不再直接堆叠 matrix/tool/event/IRQ 叶子模块。
+  - 说明文档：`docs/architecture/AGENT_PERIPH_CLUSTER.md`。
+  - 当前状态：本地结构改动已完成，待用户在 VCS 环境重新运行 `agent` regression 后确认 PASS。
 - 最小 machine-mode trap/CSR 路径：
   - `mtvec`, `mepc`, `mcause`
   - `mstatus.MIE/MPIE`, `mie.MTIE`, `mip.MTIP`
@@ -286,7 +293,7 @@ Stage C：性能优化型 CPU core
 
 详细状态见 `docs/status/VERIFICATION_MATRIX.md`。
 
-当前 Phase 6 第一轮 `rv32i_pipe_core` 仿真期 assertion 已加入，并由用户确认 VCS 回归 PASS。Stage A1 自动化回归入口第一版已完成，`smoke/core/cache/soc/full` suite 均已由用户确认 VCS PASS。Stage A2 第一轮已把 cached system / AHB master 相关 directed tests 从手写机器码迁移到软件镜像流，相关 testbench 已由用户确认 VCS PASS。Stage A2 第二轮已迁移 cached timer / UART，并给回归脚本加入软件镜像构建和缺失检查；用户已确认 `mmio` suite VCS PASS。Stage A2 第三轮已迁移 timer IRQ、access fault、instruction access fault 和 misaligned trap 相关 cached directed tests，并已由用户确认 VCS PASS。Stage A2 第四轮已迁移 branch predict 和 RV32M pipeline directed tests，并已由用户确认 VCS PASS。Stage A2 第五轮已迁移 `rv32i_pipe_core_tb` 和 `rv32i_trap_csr_tb` 到软件镜像流，并已由用户确认 VCS PASS。Stage A2 第六轮已把剩余 CPU 程序型 directed tests 一次性迁移到软件镜像流，并已由用户确认 full regression PASS，日志目录为 `sim/log/regress/20260520_173852-full`。Stage A3 第一版项目内 ISA 基础测试子集已新增并接入 `isa/core/full` suite，用户已确认 `rv32i_pipe_isa_basic_tb` VCS PASS：`cycle=476`、`instret=184`、`stall_cycle=190`、`flush_cycle=49`、`branch_count=48`、`branch_mispredict_count=48`。Agent workload baseline v0.1 已由用户确认 VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`。Agent matrix accelerator v0.2a/v0.2b 和 Tool-call Detector v0.3 已完成 RTL、SoC 接线、软件镜像和 directed tests，并已由用户确认 `agent` regression PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260521_162353-agent`。Agent IRQ Aggregator v0.4 已完成 RTL、SoC 接线、软件镜像和 directed test，并已由用户确认 `agent` regression PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_095831-agent`。Agent Event Counter v0.5 已完成 RTL、SoC 接线、软件镜像和 directed test，并已由用户确认 `agent` regression PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_102533-agent`。Stage A4 第一版质量检查入口已新增，PowerShell `basic` suite 已通过 filelist/SDC 检查，`all -DryRun` 已验证命令路径，Bash 脚本已通过语法检查；本机未安装 Verilator/Yosys/OpenSTA，真实 lint/synth/timing 运行当前为工具缺失导致的 `SKIP`。Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/architecture/RV32I_CPU_IP_DELIVERY.md` 并把 README、接口索引和 AHB 文档入口统一到 `rv32i_cached_ahb_master_top`。Linux 回归机暂未配置 `riscv-none-elf-gcc`，因此 `--build-software` 会停在工具链预检查；使用已生成 MEMH 的普通 `make sim` 路径已确认通过。
+当前 Phase 6 第一轮 `rv32i_pipe_core` 仿真期 assertion 已加入，并由用户确认 VCS 回归 PASS。Stage A1 自动化回归入口第一版已完成，`smoke/core/cache/soc/full` suite 均已由用户确认 VCS PASS。Stage A2 第一轮已把 cached system / AHB master 相关 directed tests 从手写机器码迁移到软件镜像流，相关 testbench 已由用户确认 VCS PASS。Stage A2 第二轮已迁移 cached timer / UART，并给回归脚本加入软件镜像构建和缺失检查；用户已确认 `mmio` suite VCS PASS。Stage A2 第三轮已迁移 timer IRQ、access fault、instruction access fault 和 misaligned trap 相关 cached directed tests，并已由用户确认 VCS PASS。Stage A2 第四轮已迁移 branch predict 和 RV32M pipeline directed tests，并已由用户确认 VCS PASS。Stage A2 第五轮已迁移 `rv32i_pipe_core_tb` 和 `rv32i_trap_csr_tb` 到软件镜像流，并已由用户确认 VCS PASS。Stage A2 第六轮已把剩余 CPU 程序型 directed tests 一次性迁移到软件镜像流，并已由用户确认 full regression PASS，日志目录为 `sim/log/regress/20260520_173852-full`。Stage A3 第一版项目内 ISA 基础测试子集已新增并接入 `isa/core/full` suite，用户已确认 `rv32i_pipe_isa_basic_tb` VCS PASS：`cycle=476`、`instret=184`、`stall_cycle=190`、`flush_cycle=49`、`branch_count=48`、`branch_mispredict_count=48`。Agent workload baseline v0.1 已由用户确认 VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`。Agent matrix accelerator v0.2a/v0.2b 和 Tool-call Detector v0.3 已完成 RTL、SoC 接线、软件镜像和 directed tests，并已由用户确认 `agent` regression PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260521_162353-agent`。Agent IRQ Aggregator v0.4 已完成 RTL、SoC 接线、软件镜像和 directed test，并已由用户确认 `agent` regression PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_095831-agent`。Agent Event Counter v0.5 已完成 RTL、SoC 接线、软件镜像和 directed test，并已由用户确认 `agent` regression PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_102533-agent`。Agent peripheral cluster v0.6 已完成本地结构整理，现有 Agent leaves 已收束进 `rtl/agent/rv32i_agent_periph_cluster.v`，当前需要重新运行 `agent` regression 确认重构后行为未变。Stage A4 第一版质量检查入口已新增，PowerShell `basic` suite 已通过 filelist/SDC 检查，`all -DryRun` 已验证命令路径，Bash 脚本已通过语法检查；本机未安装 Verilator/Yosys/OpenSTA，真实 lint/synth/timing 运行当前为工具缺失导致的 `SKIP`。Stage A5 CPU IP 交付文档第一版已补齐，新增 `docs/architecture/RV32I_CPU_IP_DELIVERY.md` 并把 README、接口索引和 AHB 文档入口统一到 `rv32i_cached_ahb_master_top`。Linux 回归机暂未配置 `riscv-none-elf-gcc`，因此 `--build-software` 会停在工具链预检查；使用已生成 MEMH 的普通 `make sim` 路径已确认通过。
 
 ## 设计假设
 
@@ -302,11 +309,12 @@ Stage C：性能优化型 CPU core
 
 ## 下一步候选
 
-1. 开始结构整理：把当前 demo 链路收束为 CPU subsystem、SoC fabric、Agent peripherals、software smoke、verification 五条清晰骨架。
-2. 建立 NPU / Agent Accelerator 的软件功能模型和测试向量，不直接跳到完整 32x32 NPU RTL。
-3. 扩展 agent workload baseline 的结果记录，按 workload 分段统计 cycle/branch/stall。
-4. 在 Linux/CI 或本机安装 Verilator/Yosys 后运行 `tools/quality` 的 `lint/synth/all` suite，形成第一版 warning baseline。
-5. 根据后续测试增长继续维护自动化回归 suite。
+1. 重新运行 `agent` regression，确认 Agent peripheral cluster v0.6 结构整理后行为未变。
+2. 继续结构整理：把 demo software、runtime driver、directed tests 和 Agent docs 再拆成更清楚的骨架。
+3. 建立 NPU / Agent Accelerator 的软件功能模型和测试向量，不直接跳到完整 32x32 NPU RTL。
+4. 扩展 agent workload baseline 的结果记录，按 workload 分段统计 cycle/branch/stall。
+5. 在 Linux/CI 或本机安装 Verilator/Yosys 后运行 `tools/quality` 的 `lint/synth/all` suite，形成第一版 warning baseline。
+6. 根据后续测试增长继续维护自动化回归 suite。
 
 ## 上下文规则
 

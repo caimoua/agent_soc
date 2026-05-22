@@ -430,11 +430,21 @@ Docs/status handoff
 
 短期要做：
 
-- 明确 `rv32i_ahb_matrix_apb_soc_top` 是 demo top 还是 v0 SoC top。
-- 把 Agent peripheral 的 APB map 单独成文。
+- 明确 `rv32i_ahb_matrix_apb_soc_top` 是 demo top 还是 v0 SoC top：v0.6 先把它定义为 v0 SoC demo top，Agent 叶子模块通过 `rv32i_agent_periph_cluster` 收束。
+- 把 Agent peripheral 的 APB map 单独成文：第一版见 `docs/architecture/AGENT_PERIPH_CLUSTER.md`。
 - 把 demo software 与后续 runtime/driver 目录分开。
 - 把 directed tests 按 CPU / SoC / Agent peripheral 分组。
 - 为下一阶段 NPU functional model 预留 `model/` 和 golden vector 入口。
+
+v0.6 第一刀：
+
+```text
+rtl/agent/rv32i_agent_periph_cluster.v
+filelist/cpu_filelist/agent_rtl.f
+docs/architecture/AGENT_PERIPH_CLUSTER.md
+```
+
+状态：本地结构整理已完成，等待重新运行 `agent` regression 确认。
 
 ## 11. 功能模型目录
 

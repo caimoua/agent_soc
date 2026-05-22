@@ -131,6 +131,7 @@ RISC-V GNU 工具链安装说明见 `docs/tooling/RISCV_TOOLCHAIN.md`。
 - 已新增 Tool-call Detector v0.3 原型，挂在 `0x4200_3000` APB window，支持最多 8 个 16-bit token pattern 匹配、match_count 和 IRQ pending，软件镜像和 SoC directed test 已由 VCS 确认通过。
 - 已新增 Agent IRQ Aggregator v0.4，把 tool-call/matrix/timer IRQ 先聚合到当前 CPU MTIP 路径，并已由 VCS 确认通过。
 - 已新增 Agent Event Counter v0.5，挂在 `0x4200_4000` APB window，记录 tool token/match/IRQ、matrix start/done、aggregated IRQ source 和 match-to-clear latency，软件镜像和 SoC directed test 已由 VCS 确认通过。
+- 已新增 Agent peripheral cluster v0.6 结构边界，把 matrix/tool/IRQ/event counter 收束到 `rtl/agent/rv32i_agent_periph_cluster.v`；该轮 RTL 重构等待重新运行 `agent` regression 确认。
 - 已新增最小 MMIO timer 外设，并给 D-cache 增加默认 MMIO uncached bypass。说明见 `docs/architecture/RV32I_TIMER.md`。
 - 已把 `timer_irq` 接入 pipeline trap/CSR 框架，新增最小 `mstatus/mie/mip`，支持 machine timer interrupt 和 `mret` 返回。
 - 已把 I/D 侧 bus decode error 接入 pipeline trap/CSR，支持 instruction/load/store access fault，并新增 `rv32i_cached_access_fault_tb` 和 `rv32i_cached_instr_access_fault_tb`。
@@ -140,7 +141,7 @@ RISC-V GNU 工具链安装说明见 `docs/tooling/RISCV_TOOLCHAIN.md`。
 
 | 路径 | 用途 |
 | --- | --- |
-| `rtl/` | CPU、cache、bus 和顶层 wrapper RTL |
+| `rtl/` | CPU、cache、bus、Agent 外设簇和顶层 wrapper RTL |
 | `filelist/` | 仿真使用的 RTL filelist |
 | `sim/` | VCS/Verdi 仿真工作区 |
 | `software/` | 汇编/C 测试程序和构建脚本 |

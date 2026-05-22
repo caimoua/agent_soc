@@ -29,6 +29,7 @@
 | Tool-call detector SoC | `testcases/rv32i_tool_call_detector_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_tool_call_detector_soc_tb.sv TOP_NAME=rv32i_tool_call_detector_soc_tb` | PASS |
 | Tool-call detector IRQ via aggregator | `testcases/rv32i_tool_call_detector_irq_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_tool_call_detector_irq_soc_tb.sv TOP_NAME=rv32i_tool_call_detector_irq_soc_tb` | PASS |
 | Agent event counter SoC | `testcases/rv32i_agent_event_counter_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_agent_event_counter_soc_tb.sv TOP_NAME=rv32i_agent_event_counter_soc_tb` | PASS |
+| Agent peripheral cluster refactor | `agent` regression suite | `bash ./regress/run_regression.sh --suite agent --keep-going` | PENDING |
 | Trap/CSR | `testcases/rv32i_trap_csr_tb.sv` | `make sim TB_FILE=./testcases/rv32i_trap_csr_tb.sv TOP_NAME=rv32i_trap_csr_tb` | PASS |
 | I-cache | `testcases/rv32i_icache_tb.sv` | `make sim TB_FILE=./testcases/rv32i_icache_tb.sv TOP_NAME=rv32i_icache_tb` | PASS |
 | D-cache | `testcases/rv32i_dcache_tb.sv` | `make sim TB_FILE=./testcases/rv32i_dcache_tb.sv TOP_NAME=rv32i_dcache_tb` | PASS |
@@ -125,6 +126,7 @@ MMIO 改动后，至少运行：
 
 ## 最近人工更新
 
+- 2026-05-22：新增 Agent peripheral cluster v0.6 结构整理：`rtl/agent/rv32i_agent_periph_cluster.v` 收束 matrix/tool/IRQ/event counter 叶子模块，`rv32i_apb_periph_mux` 对 SoC top 只暴露一组 `agent_*` 访问口。该轮是 RTL 结构重构，需重新运行 `agent` regression，当前标记为 PENDING。
 - 2026-05-22：用户确认 `agent` regression suite VCS PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_095831-agent`。本轮确认新增 `rv32i_tool_call_detector_irq_soc_tb` PASS，覆盖 Tool-call Detector IRQ 经 Agent IRQ Aggregator 接入 CPU MTIP 路径、handler 清 pending 和 `mret` 返回主程序。
 - 2026-05-22：用户确认 `agent` regression suite VCS PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_102533-agent`。本轮确认新增 `rv32i_agent_event_counter_soc_tb` PASS：`cycle=1335`、`instret=129`、`stall_cycle=1185`、`flush_cycle=20`、`tool_token=8`、`tool_match=1`、`tool_irq=1`、`matrix_start=1`、`matrix_done=1`、`agent_irq=2`、`last_irq_source=0x0000000c`、`latency_last=113`、`status=0x000000c2`。
 - 2026-05-22：新增 Agent Event Counter v0.5 SoC directed test：`rv32i_agent_event_counter_soc_tb`。该测试加载 `software/bin/agent_event_counter.memh`，通过 APB `0x4200_4000` 检查 tool token/match/IRQ、matrix start/done、aggregated IRQ source 和 match-to-clear latency counters。已由用户通过 `agent` regression 确认 PASS。
