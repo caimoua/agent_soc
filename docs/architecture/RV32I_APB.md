@@ -20,6 +20,7 @@ rv32i_cached_ahb_master_top
         -> rv32i_uart
         -> rv32i_agent_matrix_accel
         -> rv32i_tool_call_detector
+        -> rv32i_agent_event_counter
 ```
 
 ## Modules
@@ -31,12 +32,12 @@ rv32i_cached_ahb_master_top
   - Converts AHB `HSIZE/HADDR` into APB `PSTRB`.
   - Converts APB `PSLVERR` into AHB `HRESP=ERROR`.
 - `rtl/periph/rv32i_apb_periph_mux.v`
-  - Decodes APB timer, UART, Agent Matrix Accelerator, and Tool-call Detector windows.
+  - Decodes APB timer, UART, Agent Matrix Accelerator, Tool-call Detector, and Agent Event Counter windows.
   - Unmatched APB accesses complete with `PSLVERR=1`.
 - `rtl/top/rv32i_ahb_matrix_apb_soc_top.v`
   - Keeps flash/SRAM/AHB-peripheral AHB slots external.
-  - Instantiates internal APB timer, UART, and Agent Matrix Accelerator.
-  - Routes timer interrupt into the CPU subsystem.
+  - Instantiates internal APB timer, UART, Agent Matrix Accelerator, Tool-call Detector, IRQ aggregator, and Agent Event Counter.
+  - Routes the aggregated Agent/timer IRQ into the CPU subsystem through the current MTIP path.
 - `rtl/accel/rv32i_agent_matrix_accel.v`
   - APB scratchpad INT8 `4x4` matrix by `4x1` vector accelerator.
   - SRAM-mode register path can read matrix/vector from SRAM and write result back through the accelerator AHB master.
@@ -44,6 +45,9 @@ rv32i_cached_ahb_master_top
 - `rtl/accel/rv32i_tool_call_detector.v`
   - APB token pattern detector.
   - Matches up to 8 packed 16-bit tokens and exposes match count/status/IRQ pending.
+- `rtl/accel/rv32i_agent_event_counter.v`
+  - APB event/perf counter window.
+  - Counts tool token/match/IRQ, matrix start/done/IRQ, aggregated IRQ, and match-to-clear latency.
 
 ## Memory Map
 
@@ -55,6 +59,7 @@ rv32i_cached_ahb_master_top
 0x4200_1000 - 0x4200_1FFF  APB UART
 0x4200_2000 - 0x4200_2FFF  APB Agent Matrix Accelerator
 0x4200_3000 - 0x4200_3FFF  APB Tool-call Detector
+0x4200_4000 - 0x4200_4FFF  APB Agent Event Counter
 ```
 
 ## Directed Test
@@ -95,5 +100,22 @@ make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv TOP_NAME=rv
 This test boots from flash, writes APB scratchpad matrix/vector data at `0x4200_2000`, starts the accelerator, polls done, checks four int32 results and IRQ pending/clear behavior, then stops on `ebreak`.
 
 The SRAM-mode test programs `SRC_A/SRC_B/DST/STRIDE/FLAGS`, then validates that the accelerator receives AHB M1 grants, reads SRAM input, and writes the result window back to SRAM.
+
+Status: user-confirmed VCS PASS on 2026-05-21.
+
+Agent Event Counter smoke image:
+
+```text
+software/asm/agent_event_counter.S
+software/bin/agent_event_counter.memh
+```
+
+Run from `sim/`:
+
+```bash
+make sim TB_FILE=./testcases/rv32i_agent_event_counter_soc_tb.sv TOP_NAME=rv32i_agent_event_counter_soc_tb
+```
+
+This test boots from flash, runs one matrix accelerator transaction and one tool-call detector match, then reads the `0x4200_4000` event counter window to check token/match/IRQ, matrix start/done, last IRQ source, and match-to-clear latency counters.
 
 Status: pending VCS confirmation.

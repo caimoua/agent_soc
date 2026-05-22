@@ -127,8 +127,10 @@ RISC-V GNU 工具链安装说明见 `docs/tooling/RISCV_TOOLCHAIN.md`。
 - 已新增 Stage A3 第一版 RV32I/RV32M ISA 基础测试子集，说明见 `docs/verification/RV32I_ISA_TESTS.md`；已通过 VCS。
 - 已新增 Stage A4 第一版质量检查入口，支持 filelist/SDC 检查，并可选接入 Verilator lint、Yosys 综合和 OpenSTA 时序检查。说明见 `docs/verification/RV32I_QUALITY_CHECKS.md`。
 - 已新增玄铁式 Agent Core 路线分析、AI Agent MCU + NPU SoC 新路线承接和 Agent SoC v0 可执行架构，后续优先建立 agent workload baseline 和 NPU/Agent Accelerator 功能模型，再做 control-flow、custom ISA、matrix accelerator 和 SoC fabric 升级。
-- 已新增 Agent Matrix Accelerator v0.2a/v0.2b 原型，挂在 `rv32i_ahb_matrix_apb_soc_top` 的 `0x4200_2000` APB window；v0.2a 走 APB scratchpad，v0.2b 通过第二 AHB master 读写 SRAM，软件镜像和 SoC directed tests 已补齐，等待 VCS 确认。
-- 已新增 Tool-call Detector v0.3 原型，挂在 `0x4200_3000` APB window，支持最多 8 个 16-bit token pattern 匹配、match_count 和 IRQ pending，软件镜像和 SoC directed test 已补齐，等待 VCS 确认。
+- 已新增 Agent Matrix Accelerator v0.2a/v0.2b 原型，挂在 `rv32i_ahb_matrix_apb_soc_top` 的 `0x4200_2000` APB window；v0.2a 走 APB scratchpad，v0.2b 通过第二 AHB master 读写 SRAM，软件镜像和 SoC directed tests 已由 VCS 确认通过。
+- 已新增 Tool-call Detector v0.3 原型，挂在 `0x4200_3000` APB window，支持最多 8 个 16-bit token pattern 匹配、match_count 和 IRQ pending，软件镜像和 SoC directed test 已由 VCS 确认通过。
+- 已新增 Agent IRQ Aggregator v0.4，把 tool-call/matrix/timer IRQ 先聚合到当前 CPU MTIP 路径，并已由 VCS 确认通过。
+- 已新增 Agent Event Counter v0.5，挂在 `0x4200_4000` APB window，记录 tool token/match/IRQ、matrix start/done、aggregated IRQ source 和 match-to-clear latency；软件镜像和 SoC directed test 已补齐，等待 VCS 确认。
 - 已新增最小 MMIO timer 外设，并给 D-cache 增加默认 MMIO uncached bypass。说明见 `docs/architecture/RV32I_TIMER.md`。
 - 已把 `timer_irq` 接入 pipeline trap/CSR 框架，新增最小 `mstatus/mie/mip`，支持 machine timer interrupt 和 `mret` 返回。
 - 已把 I/D 侧 bus decode error 接入 pipeline trap/CSR，支持 instruction/load/store access fault，并新增 `rv32i_cached_access_fault_tb` 和 `rv32i_cached_instr_access_fault_tb`。

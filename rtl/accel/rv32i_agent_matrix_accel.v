@@ -25,7 +25,9 @@ module rv32i_agent_matrix_accel (
   output wire [31:0] dbg_result1,
   output wire [31:0] dbg_result2,
   output wire [31:0] dbg_result3,
-  output wire [31:0] dbg_start_count
+  output wire [31:0] dbg_start_count,
+  output wire        event_start,
+  output wire        event_done
 );
 
   localparam [11:0] ADDR_CTRL       = 12'h000;
@@ -85,6 +87,7 @@ module rv32i_agent_matrix_accel (
   wire        scratch_a_sel;
   wire        scratch_b_sel;
   wire        result_sel;
+  wire        done_event;
   wire [1:0]  scratch_word;
   wire [1:0]  result_word;
   wire [31:0] scratch_a_rdata;
@@ -187,6 +190,17 @@ module rv32i_agent_matrix_accel (
   assign dbg_result2     = result_q[2];
   assign dbg_result3     = result_q[3];
   assign dbg_start_count = start_count_q;
+  assign done_event      = start_scratch ||
+                           (((state_q == STATE_LOAD_A) ||
+                             (state_q == STATE_LOAD_B) ||
+                             (state_q == STATE_STORE)) &&
+                            mem_ready &&
+                            (mem_error ||
+                             ((state_q == STATE_STORE) &&
+                              (mem_index_q == 2'd3))));
+  assign event_start     = start_scratch ||
+                           (start_sram && (state_q == STATE_IDLE));
+  assign event_done      = done_event;
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin

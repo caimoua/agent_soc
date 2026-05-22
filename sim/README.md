@@ -60,6 +60,8 @@ rv32i_pipe_cached_bus_tb
   -> ../software/bin/pipe_cached_bus.memh
 rv32i_pipe_isa_basic_tb
   -> ../software/bin/isa_basic.memh
+rv32i_agent_event_counter_soc_tb
+  -> ../software/bin/agent_event_counter.memh
 ```
 
 如需覆盖默认镜像，可以传：
@@ -103,7 +105,7 @@ bash ./regress/run_regression.sh --suite smoke
 当前 suite：
 
 ```text
-smoke, core, cache, ahb, mmio, soc, isa, full
+smoke, core, cache, ahb, mmio, soc, isa, agent, full
 ```
 
 ISA 基础子集：

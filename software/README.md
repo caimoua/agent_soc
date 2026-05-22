@@ -27,6 +27,7 @@ agent_matrix_accel
 agent_matrix_accel_sram
 tool_call_detector
 tool_call_detector_irq
+agent_event_counter
 cached_system_smoke
 cached_ahb_master
 cached_timer

@@ -1,6 +1,6 @@
 ﻿# 接口索引
 
-最后更新：2026-05-21
+最后更新：2026-05-22
 
 本文记录稳定模块边界，后续工作不需要每次重新扫描大量 RTL。
 
@@ -108,6 +108,7 @@ APB 外设：
 - UART：`0x4200_1000`
 - Agent Matrix Accelerator：`0x4200_2000`
 - Tool-call Detector：`0x4200_3000`
+- Agent Event Counter：`0x4200_4000`
 
 新增中断/状态输出：
 
@@ -116,6 +117,8 @@ APB 外设：
 - `tool_call_irq`：Tool-call Detector 原始 IRQ 输出。
 - `cpu_timer_irq`：v0.4 聚合后的 CPU interrupt 输入，当前由 `timer_irq | agent_matrix_irq | tool_call_irq` 生成并接到 CPU MTIP 路径。
 - `dbg_agent_irq_status`：v0.4 IRQ aggregator debug status，bit0 raw timer、bit1 matrix、bit2 tool-call、bit3 aggregated CPU IRQ。
+- `dbg_agent_event_status`：v0.5 Agent Event Counter status。
+- `dbg_agent_event_*`：v0.5 Agent Event Counter debug counters，覆盖 tool token/match/IRQ、matrix start/done、agent IRQ source 和 match-to-clear latency。
 - `dbg_matrix_m0_grant_count`：CPU master AHB grant count。
 - `dbg_matrix_m1_grant_count`：accelerator master AHB grant count。
 
@@ -521,3 +524,41 @@ Debug 输出：
 
 - `cpu_timer_irq`：`timer_irq | agent_matrix_irq | tool_call_irq`
 - `dbg_status`：bit0 raw timer、bit1 matrix、bit2 tool-call、bit3 aggregated CPU IRQ
+
+### `rv32i_agent_event_counter`
+
+文件：`rtl/accel/rv32i_agent_event_counter.v`
+
+base：APB SoC 中的 `0x4200_4000`。
+
+用途：Agent SoC v0.5 的最小事件/性能计数窗口。它从 Tool-call Detector、Agent Matrix Accelerator 和 IRQ aggregator path 采样事件，提供 CPU 可读的 event counter window。
+
+寄存器：
+
+- `0x000 CTRL`：写 bit0=1 清全部计数器。
+- `0x004 STATUS`：bit0 latency active, bit1 last IRQ valid, bit[7:4] last IRQ source。
+- `0x008 TOOL_TOKEN_COUNT`
+- `0x00c TOOL_MATCH_COUNT`
+- `0x010 TOOL_IRQ_COUNT`
+- `0x014 MATRIX_START_COUNT`
+- `0x018 MATRIX_DONE_COUNT`
+- `0x01c AGENT_IRQ_COUNT`
+- `0x020 LAST_IRQ_SOURCE`
+- `0x024 LATENCY_LAST`
+- `0x028 LATENCY_MIN`
+- `0x02c LATENCY_MAX`
+- `0x030 LATENCY_COUNT`
+- `0x034 MATRIX_IRQ_COUNT`
+- `0x038 TIMER_IRQ_COUNT`
+
+Debug 输出：
+
+- `dbg_status`
+- `dbg_tool_token_count`
+- `dbg_tool_match_count`
+- `dbg_tool_irq_count`
+- `dbg_matrix_start_count`
+- `dbg_matrix_done_count`
+- `dbg_agent_irq_count`
+- `dbg_last_irq_source`
+- `dbg_latency_last`

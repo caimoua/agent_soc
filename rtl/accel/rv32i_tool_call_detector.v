@@ -14,7 +14,10 @@ module rv32i_tool_call_detector (
   output wire [31:0] dbg_status,
   output wire [31:0] dbg_match_count,
   output wire [31:0] dbg_token_count,
-  output wire [31:0] dbg_last_token
+  output wire [31:0] dbg_last_token,
+  output wire        event_token,
+  output wire        event_match,
+  output wire        event_irq_clear
 );
 
   localparam [11:0] ADDR_CTRL        = 12'h000;
@@ -122,6 +125,9 @@ module rv32i_tool_call_detector (
   assign dbg_match_count = match_count_q;
   assign dbg_token_count = {28'd0, token_count_q};
   assign dbg_last_token  = {16'd0, last_token_q};
+  assign event_token     = token_write;
+  assign event_match     = token_match;
+  assign event_irq_clear = irq_clear_write;
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin

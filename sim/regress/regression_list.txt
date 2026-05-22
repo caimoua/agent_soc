@@ -10,6 +10,7 @@ rv32i_agent_matrix_accel_soc_tb|./testcases/rv32i_agent_matrix_accel_soc_tb.sv|r
 rv32i_agent_matrix_accel_sram_soc_tb|./testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv|rv32i_agent_matrix_accel_sram_soc_tb|agent|
 rv32i_tool_call_detector_soc_tb|./testcases/rv32i_tool_call_detector_soc_tb.sv|rv32i_tool_call_detector_soc_tb|agent|
 rv32i_tool_call_detector_irq_soc_tb|./testcases/rv32i_tool_call_detector_irq_soc_tb.sv|rv32i_tool_call_detector_irq_soc_tb|agent|
+rv32i_agent_event_counter_soc_tb|./testcases/rv32i_agent_event_counter_soc_tb.sv|rv32i_agent_event_counter_soc_tb|agent|
 rv32i_pipe_muldiv_tb|./testcases/rv32i_pipe_muldiv_tb.sv|rv32i_pipe_muldiv_tb|smoke,core,full|
 rv32i_branch_predictor_tb|./testcases/rv32i_branch_predictor_tb.sv|rv32i_branch_predictor_tb|core,full|
 rv32i_pipe_branch_predict_tb|./testcases/rv32i_pipe_branch_predict_tb.sv|rv32i_pipe_branch_predict_tb|core,full|

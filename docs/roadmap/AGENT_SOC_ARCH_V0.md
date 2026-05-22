@@ -1,6 +1,6 @@
 ﻿# Agent SoC Architecture v0
 
-最后更新：2026-05-21
+最后更新：2026-05-22
 
 本文把新仓库的第一版可执行方案固定下来。它不是最终芯片规格，而是把长期的 AI Agent MCU + NPU SoC 目标收敛成可以开始写软件、RTL 和测试的 v0 架构。
 
@@ -45,6 +45,7 @@ rv32i_ahb_matrix_apb_soc_top
     rv32i_uart
     rv32i_agent_matrix_accel
     rv32i_tool_call_detector
+    rv32i_agent_event_counter
   rv32i_agent_irq_aggregator
 ```
 
@@ -68,7 +69,7 @@ v0 预留新增 APB 外设：
 | --- | --- | --- |
 | `0x4200_2000` | Agent Matrix Accelerator | v0.2a/v0.2b 已接入并由 VCS 确认 |
 | `0x4200_3000` | Tool-call Detector | v0.3 已接入并由 VCS 确认 |
-| `0x4200_4000` | Agent perf / event counter window | v0.3+ |
+| `0x4200_4000` | Agent Event Counter | v0.5 已接入，等待 VCS 确认 |
 
 长期 SoC 目标中的 `0xE000_0000` NPU 控制空间和 `0xF000_0000` Agent Accelerator 控制空间暂时只保留在北极星路线里，v0 不急着切换到该地址图。
 
@@ -384,7 +385,58 @@ dbg_agent_irq_status
 
 当前状态：directed test 已接入 `agent` suite，并已由用户通过 VCS 确认 PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_095831-agent`。
 
-## 9. 功能模型目录
+## 9. v0.5：Agent Event Counter
+
+v0.5 的任务是给当前 demo 链路加硬件观测面。它记录 Tool-call Detector、Matrix Accelerator 和 IRQ aggregator 的关键事件，让后续整理 SoC 骨架和推进 NPU 功能模型时有可读计数。
+
+当前实现：
+
+```text
+rtl/accel/rv32i_agent_event_counter.v
+software/asm/agent_event_counter.S
+software/bin/agent_event_counter.memh
+sim/testcases/rv32i_agent_event_counter_soc_tb.sv
+docs/architecture/AGENT_EVENT_COUNTER.md
+```
+
+APB window：
+
+```text
+0x4200_4000
+```
+
+第一版计数：
+
+- Tool token / match / IRQ count。
+- Matrix start / done / IRQ count。
+- Aggregated CPU IRQ count。
+- Last IRQ source。
+- Tool match 到 IRQ clear 的 latency last/min/max/count。
+
+当前状态：directed test 已接入 `agent` suite，等待 VCS 确认。
+
+## 10. 结构整理方向
+
+v0.5 PASS 后，当前仓库需要从 demo 形态整理为骨架形态。整理目标不是重写逻辑，而是把边界命名和目录职责固定下来：
+
+```text
+CPU subsystem
+SoC fabric
+Agent peripheral cluster
+Software smoke programs
+Verification suites
+Docs/status handoff
+```
+
+短期要做：
+
+- 明确 `rv32i_ahb_matrix_apb_soc_top` 是 demo top 还是 v0 SoC top。
+- 把 Agent peripheral 的 APB map 单独成文。
+- 把 demo software 与后续 runtime/driver 目录分开。
+- 把 directed tests 按 CPU / SoC / Agent peripheral 分组。
+- 为下一阶段 NPU functional model 预留 `model/` 和 golden vector 入口。
+
+## 11. 功能模型目录
 
 v0.1 开始建议新增：
 
@@ -405,7 +457,7 @@ model/
 - 简化 KV ring buffer 地址生成。
 - 后续再扩 RMSNorm / Softmax / RoPE。
 
-## 10. 回归和文档
+## 12. 回归和文档
 
 新增测试在用户用 VCS 确认前，`docs/status/VERIFICATION_MATRIX.md` 只能标记为 `PENDING`。
 
@@ -425,7 +477,7 @@ rv32i_tool_call_detector_tb
 
 其中后两个等 RTL 存在后再加入。
 
-## 11. 近期执行顺序
+## 13. 近期执行顺序
 
 第一步：
 

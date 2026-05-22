@@ -1,6 +1,6 @@
 # Documentation Index
 
-最后更新：2026-05-21
+最后更新：2026-05-22
 
 本文是 `docs/` 的导航入口。后续新增文档优先放入对应子目录，避免所有主题混在根目录。
 
@@ -32,6 +32,8 @@ CPU、cache、bus、SoC wrapper、trap/CSR 和外设设计说明：
 - `architecture/RV32I_LIMITATIONS.md`
 - `architecture/AGENT_MATRIX_ACCEL.md`
 - `architecture/TOOL_CALL_DETECTOR.md`
+- `architecture/AGENT_IRQ_AGGREGATOR.md`
+- `architecture/AGENT_EVENT_COUNTER.md`
 - `architecture/RV32I_PIPELINE_CORE.md`
 - `architecture/RV32I_BRANCH_PREDICT.md`
 - `architecture/RV32I_M_EXTENSION.md`

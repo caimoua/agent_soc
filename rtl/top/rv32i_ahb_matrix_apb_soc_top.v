@@ -98,7 +98,16 @@ module rv32i_ahb_matrix_apb_soc_top #(
   output wire [31:0] dbg_tool_call_status,
   output wire [31:0] dbg_tool_call_match_count,
   output wire [31:0] dbg_tool_call_token_count,
-  output wire [31:0] dbg_tool_call_last_token
+  output wire [31:0] dbg_tool_call_last_token,
+  output wire [31:0] dbg_agent_event_status,
+  output wire [31:0] dbg_agent_event_tool_token_count,
+  output wire [31:0] dbg_agent_event_tool_match_count,
+  output wire [31:0] dbg_agent_event_tool_irq_count,
+  output wire [31:0] dbg_agent_event_matrix_start_count,
+  output wire [31:0] dbg_agent_event_matrix_done_count,
+  output wire [31:0] dbg_agent_event_agent_irq_count,
+  output wire [31:0] dbg_agent_event_last_irq_source,
+  output wire [31:0] dbg_agent_event_latency_last
 );
 
   wire        apb_hsel;
@@ -157,6 +166,14 @@ module rv32i_ahb_matrix_apb_soc_top #(
   wire        tool_call_ready;
   wire [31:0] tool_call_rdata;
 
+  wire        agent_event_valid;
+  wire        agent_event_write;
+  wire [31:0] agent_event_addr;
+  wire [31:0] agent_event_wdata;
+  wire [3:0]  agent_event_wstrb;
+  wire        agent_event_ready;
+  wire [31:0] agent_event_rdata;
+
   wire        agent_matrix_mem_valid;
   wire        agent_matrix_mem_write;
   wire [31:0] agent_matrix_mem_addr;
@@ -176,6 +193,11 @@ module rv32i_ahb_matrix_apb_soc_top #(
   wire [31:0] accel_hrdata;
   wire        accel_hready;
   wire [1:0]  accel_hresp;
+  wire        tool_event_token;
+  wire        tool_event_match;
+  wire        tool_event_irq_clear;
+  wire        matrix_event_start;
+  wire        matrix_event_done;
 
   rv32i_ahb_matrix_soc_top #(
     .ICACHE_INDEX_BITS(ICACHE_INDEX_BITS),
@@ -360,6 +382,13 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .tool_call_wstrb(tool_call_wstrb),
     .tool_call_ready(tool_call_ready),
     .tool_call_rdata(tool_call_rdata),
+    .agent_event_valid(agent_event_valid),
+    .agent_event_write(agent_event_write),
+    .agent_event_addr (agent_event_addr),
+    .agent_event_wdata(agent_event_wdata),
+    .agent_event_wstrb(agent_event_wstrb),
+    .agent_event_ready(agent_event_ready),
+    .agent_event_rdata(agent_event_rdata),
     .dbg_decode_error (dbg_apb_decode_error)
   );
 
@@ -387,6 +416,36 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .tool_call_irq    (tool_call_irq),
     .cpu_timer_irq    (cpu_timer_irq),
     .dbg_status       (dbg_agent_irq_status)
+  );
+
+  rv32i_agent_event_counter u_agent_event_counter (
+    .clk                         (clk),
+    .rst_n                       (rst_n),
+    .valid                       (agent_event_valid),
+    .write                       (agent_event_write),
+    .addr                        (agent_event_addr),
+    .wdata                       (agent_event_wdata),
+    .wstrb                       (agent_event_wstrb),
+    .ready                       (agent_event_ready),
+    .rdata                       (agent_event_rdata),
+    .tool_token_event            (tool_event_token),
+    .tool_match_event            (tool_event_match),
+    .tool_irq_clear_event        (tool_event_irq_clear),
+    .matrix_start_event          (matrix_event_start),
+    .matrix_done_event           (matrix_event_done),
+    .timer_irq                   (timer_irq),
+    .agent_matrix_irq            (agent_matrix_irq),
+    .tool_call_irq               (tool_call_irq),
+    .cpu_timer_irq               (cpu_timer_irq),
+    .dbg_status                  (dbg_agent_event_status),
+    .dbg_tool_token_count        (dbg_agent_event_tool_token_count),
+    .dbg_tool_match_count        (dbg_agent_event_tool_match_count),
+    .dbg_tool_irq_count          (dbg_agent_event_tool_irq_count),
+    .dbg_matrix_start_count      (dbg_agent_event_matrix_start_count),
+    .dbg_matrix_done_count       (dbg_agent_event_matrix_done_count),
+    .dbg_agent_irq_count         (dbg_agent_event_agent_irq_count),
+    .dbg_last_irq_source         (dbg_agent_event_last_irq_source),
+    .dbg_latency_last            (dbg_agent_event_latency_last)
   );
 
   rv32i_uart u_uart (
@@ -429,7 +488,9 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .dbg_result1     (dbg_agent_matrix_result1),
     .dbg_result2     (dbg_agent_matrix_result2),
     .dbg_result3     (dbg_agent_matrix_result3),
-    .dbg_start_count (dbg_agent_matrix_start_count)
+    .dbg_start_count (dbg_agent_matrix_start_count),
+    .event_start     (matrix_event_start),
+    .event_done      (matrix_event_done)
   );
 
   rv32i_tool_call_detector u_tool_call_detector (
@@ -446,7 +507,10 @@ module rv32i_ahb_matrix_apb_soc_top #(
     .dbg_status      (dbg_tool_call_status),
     .dbg_match_count (dbg_tool_call_match_count),
     .dbg_token_count (dbg_tool_call_token_count),
-    .dbg_last_token  (dbg_tool_call_last_token)
+    .dbg_last_token  (dbg_tool_call_last_token),
+    .event_token     (tool_event_token),
+    .event_match     (tool_event_match),
+    .event_irq_clear (tool_event_irq_clear)
   );
 
 endmodule

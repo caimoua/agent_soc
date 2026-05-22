@@ -1,6 +1,6 @@
 ﻿# 验证矩阵
 
-最后更新：2026-05-21
+最后更新：2026-05-22
 
 状态含义：
 
@@ -28,6 +28,7 @@
 | Agent matrix accelerator SRAM mode | `testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_agent_matrix_accel_sram_soc_tb.sv TOP_NAME=rv32i_agent_matrix_accel_sram_soc_tb` | PASS |
 | Tool-call detector SoC | `testcases/rv32i_tool_call_detector_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_tool_call_detector_soc_tb.sv TOP_NAME=rv32i_tool_call_detector_soc_tb` | PASS |
 | Tool-call detector IRQ via aggregator | `testcases/rv32i_tool_call_detector_irq_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_tool_call_detector_irq_soc_tb.sv TOP_NAME=rv32i_tool_call_detector_irq_soc_tb` | PASS |
+| Agent event counter SoC | `testcases/rv32i_agent_event_counter_soc_tb.sv` | `make sim TB_FILE=./testcases/rv32i_agent_event_counter_soc_tb.sv TOP_NAME=rv32i_agent_event_counter_soc_tb` | PENDING |
 | Trap/CSR | `testcases/rv32i_trap_csr_tb.sv` | `make sim TB_FILE=./testcases/rv32i_trap_csr_tb.sv TOP_NAME=rv32i_trap_csr_tb` | PASS |
 | I-cache | `testcases/rv32i_icache_tb.sv` | `make sim TB_FILE=./testcases/rv32i_icache_tb.sv TOP_NAME=rv32i_icache_tb` | PASS |
 | D-cache | `testcases/rv32i_dcache_tb.sv` | `make sim TB_FILE=./testcases/rv32i_dcache_tb.sv TOP_NAME=rv32i_dcache_tb` | PASS |
@@ -125,6 +126,7 @@ MMIO 改动后，至少运行：
 ## 最近人工更新
 
 - 2026-05-22：用户确认 `agent` regression suite VCS PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_095831-agent`。本轮确认新增 `rv32i_tool_call_detector_irq_soc_tb` PASS，覆盖 Tool-call Detector IRQ 经 Agent IRQ Aggregator 接入 CPU MTIP 路径、handler 清 pending 和 `mret` 返回主程序。
+- 2026-05-22：新增 Agent Event Counter v0.5 SoC directed test：`rv32i_agent_event_counter_soc_tb`。该测试加载 `software/bin/agent_event_counter.memh`，通过 APB `0x4200_4000` 检查 tool token/match/IRQ、matrix start/done、aggregated IRQ source 和 match-to-clear latency counters。当前状态 `PENDING`，等待用户在 VCS 环境确认。
 - 2026-05-21：用户确认 Agent workload baseline v0.1 `rv32i_agent_workload_tb` VCS PASS：`cycle=413`、`instret=331`、`stall_cycle=42`、`flush_cycle=18`、`branch_count=47`、`branch_mispredict_count=18`、`btb_hit=25`、`btb_miss=22`、`bht_update=47`。该测试覆盖 agent event loop、tool dispatch、token scan、INT8 dot 和 tiny matvec，并已接入 `agent` regression suite。
 - 2026-05-21：新增 Agent IRQ Aggregator v0.4 和 Tool-call Detector IRQ directed test：`rv32i_tool_call_detector_irq_soc_tb`。该测试加载 `software/bin/tool_call_detector_irq.memh`，把 `tool_call_irq` 通过 aggregator 映射到 CPU MTIP 路径，handler 检查 `mcause=0x80000007`、`mip.MTIP=1` 和 detector `IRQ_STATUS`，清 pending 后 `mret` 返回主程序。已由用户通过 `agent` regression 确认 PASS。
 - 2026-05-21：用户确认 `agent` regression suite VCS PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260521_162353-agent`。本轮确认 `rv32i_agent_workload_tb`、`rv32i_agent_matrix_accel_soc_tb`、`rv32i_agent_matrix_accel_sram_soc_tb` 和 `rv32i_tool_call_detector_soc_tb` 均 PASS。
