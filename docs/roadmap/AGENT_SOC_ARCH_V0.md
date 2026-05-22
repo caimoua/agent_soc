@@ -382,7 +382,7 @@ dbg_agent_irq_status
 - handler 读取 Tool-call Detector `IRQ_STATUS=1`，清 pending 后 `tool_call_irq/cpu_timer_irq` 归零。
 - `mret` 返回主程序并到达 PASS 标志。
 
-当前状态：directed test 已接入 `agent` suite，等待 VCS 确认。
+当前状态：directed test 已接入 `agent` suite，并已由用户通过 VCS 确认 PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_095831-agent`。
 
 ## 9. 功能模型目录
 

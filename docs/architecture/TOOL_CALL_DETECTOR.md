@@ -100,4 +100,4 @@ software/bin/tool_call_detector_irq.memh
 sim/testcases/rv32i_tool_call_detector_irq_soc_tb.sv
 ```
 
-当前 IRQ directed test 状态：`PENDING`，等待 VCS 环境确认。
+当前 IRQ directed test 状态：`PASS`，用户已通过 `agent` regression 确认，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_095831-agent`。
