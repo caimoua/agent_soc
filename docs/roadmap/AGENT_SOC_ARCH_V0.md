@@ -444,7 +444,7 @@ filelist/cpu_filelist/agent_rtl.f
 docs/architecture/AGENT_PERIPH_CLUSTER.md
 ```
 
-状态：本地结构整理已完成，等待重新运行 `agent` regression 确认。
+状态：结构整理已完成，并已由用户通过 `agent` regression 确认 PASS，日志目录为 `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_105035-agent`。
 
 ## 11. 功能模型目录
 

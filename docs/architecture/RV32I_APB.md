@@ -125,4 +125,4 @@ make sim TB_FILE=./testcases/rv32i_agent_event_counter_soc_tb.sv TOP_NAME=rv32i_
 
 This test boots from flash, runs one matrix accelerator transaction and one tool-call detector match, then reads the `0x4200_4000` event counter window to check token/match/IRQ, matrix start/done, last IRQ source, and match-to-clear latency counters.
 
-Status: user-confirmed VCS PASS on 2026-05-22 before v0.6 structural cluster refactor. Re-run the `agent` regression after the cluster refactor before marking v0.6 PASS.
+Status: user-confirmed VCS PASS on 2026-05-22. The v0.6 Agent peripheral cluster refactor was also confirmed by the `agent` regression suite, log directory `/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_105035-agent`.

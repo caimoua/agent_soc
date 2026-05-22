@@ -65,9 +65,15 @@ This makes the event counter a cluster-local observer rather than another top-le
 
 ## Verification Status
 
-This is a structural refactor over previously passing v0.5 logic. Local static checks can validate filelists and formatting, but VCS must rerun the `agent` suite before v0.6 is marked PASS:
+This is a structural refactor over previously passing v0.5 logic. The refactor has been confirmed by the `agent` regression suite:
 
 ```bash
 cd sim
 bash ./regress/run_regression.sh --suite agent --keep-going
+```
+
+Status: user-confirmed VCS PASS on 2026-05-22. Log directory:
+
+```text
+/home2/kairos18/workspace/ai_agent_mcu_npu_soc/sim/log/regress/20260522_105035-agent
 ```
